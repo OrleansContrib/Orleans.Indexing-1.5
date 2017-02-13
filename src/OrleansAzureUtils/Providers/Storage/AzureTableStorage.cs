@@ -42,7 +42,7 @@ namespace Orleans.Storage
     ///   &lt;/StorageProviders>
     /// </code>
     /// </example>
-    public class AzureTableStorage : IStorageProvider, IRestExceptionDecoder
+    public class AzureTableStorage : IExtendedStorageProvider, IRestExceptionDecoder
     {
         internal const string DataConnectionStringPropertyName = "DataConnectionString";
         internal const string TableNamePropertyName = "TableName";
@@ -191,6 +191,32 @@ namespace Orleans.Storage
             {
                 Log.Error((int)AzureProviderErrorCode.AzureTableProvider_WriteError,
                     $"Error Writing: GrainType={grainType} Grainid={grainReference} ETag={grainState.ETag} to Table={tableName} Exception={exc.Message}", exc);
+                throw;
+            }
+        }
+
+        /// <summary> Write state data function for this storage provider. </summary>
+        /// <see cref="IStorageProvider.WriteStateAsync"/>
+        public async Task InsertOrUpdateStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        {
+            if (tableDataManager == null) throw new ArgumentException("GrainState-Table property not initialized");
+
+            string pk = GetKeyString(grainReference);
+            if (Log.IsVerbose3)
+                Log.Verbose3((int)AzureProviderErrorCode.AzureTableProvider_WritingData, "Writing: GrainType={0} Pk={1} Grainid={2} ETag={3} to Table={4}", grainType, pk, grainReference, grainState.ETag, tableName);
+
+            var entity = new DynamicTableEntity(pk, grainType);
+            ConvertToStorageFormat(grainState.State, entity);
+            var record = new GrainStateRecord { Entity = entity, ETag = grainState.ETag };
+            try
+            {
+                await tableDataManager.InsertOrUpdate(record);
+                grainState.ETag = record.ETag;
+            }
+            catch (Exception exc)
+            {
+                Log.Error((int)AzureProviderErrorCode.AzureTableProvider_WriteError, string.Format("Error Writing: GrainType={0} Grainid={1} ETag={2} to Table={3} Exception={4}",
+                    grainType, grainReference, grainState.ETag, tableName, exc.Message), exc);
                 throw;
             }
         }
@@ -512,6 +538,13 @@ namespace Orleans.Storage
                     await tableManager.CreateTableEntryAsync(entity).ConfigureAwait(false) :
                     await tableManager.UpdateTableEntryAsync(entity, record.ETag).ConfigureAwait(false);
                 record.ETag = eTag;
+            }
+
+            public Task InsertOrUpdate(GrainStateRecord record)
+            {
+                var entity = record.Entity;
+                if (logger.IsVerbose3) logger.Verbose3((int)AzureProviderErrorCode.AzureTableProvider_Storage_Writing, "Writing: PartitionKey={0} RowKey={1} to Table={2} with ETag={3}", entity.PartitionKey, entity.RowKey, TableName, record.ETag);
+                return tableManager.UpsertTableEntryAsync(entity);
             }
 
             public async Task Delete(GrainStateRecord record)

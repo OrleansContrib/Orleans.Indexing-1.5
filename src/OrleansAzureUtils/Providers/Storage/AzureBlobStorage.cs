@@ -42,7 +42,7 @@ namespace Orleans.Storage
     ///   &lt;/StorageProviders>
     /// </code>
     /// </example>
-    public class AzureBlobStorage : IStorageProvider
+    public class AzureBlobStorage : IExtendedStorageProvider
     {
         internal const string DataConnectionStringPropertyName = AzureTableStorage.DataConnectionStringPropertyName;
         internal const string ContainerNamePropertyName = "ContainerName";
@@ -212,6 +212,63 @@ namespace Orleans.Storage
                         json,
                         Encoding.UTF8,
                         AccessCondition.GenerateIfMatchCondition(grainState.ETag),
+                        null,
+                        null).ConfigureAwait(false);
+                }
+
+                grainState.ETag = blob.Properties.ETag;
+
+                if (this.Log.IsVerbose3) this.Log.Verbose3((int)AzureProviderErrorCode.AzureBlobProvider_Storage_DataRead, "Written: GrainType={0} Grainid={1} ETag={2} to BlobName={3} in Container={4}", grainType, grainId, grainState.ETag, blobName, container.Name);
+            }
+            catch (Exception ex)
+            {
+                Log.Error((int)AzureProviderErrorCode.AzureBlobProvider_WriteError,
+                    string.Format("Error writing: GrainType={0} Grainid={1} ETag={2} to BlobName={3} in Container={4} Exception={5}", grainType, grainId, grainState.ETag, blobName, container.Name, ex.Message),
+                    ex);
+
+                throw;
+            }
+        }
+
+        /// <summary> Write state data function for this storage provider. </summary>
+        /// <see cref="IStorageProvider.WriteStateAsync"/>
+        public async Task InsertOrUpdateStateAsync(string grainType, GrainReference grainId, IGrainState grainState)
+        {
+            var blobName = GetBlobName(grainType, grainId);
+            try
+            {
+                if (this.Log.IsVerbose3) this.Log.Verbose3((int)AzureProviderErrorCode.AzureBlobProvider_Storage_Writing, "Writing: GrainType={0} Grainid={1} ETag={2} to BlobName={3} in Container={4}", grainType, grainId, grainState.ETag, blobName, container.Name);
+
+                var json = JsonConvert.SerializeObject(grainState.State, jsonSettings);
+
+                var blob = container.GetBlockBlobReference(blobName);
+                blob.Properties.ContentType = "application/json";
+
+                var containerNotFound = false;
+                try
+                {
+                    await blob.UploadTextAsync(
+                            json,
+                            Encoding.UTF8,
+                            null,
+                            null,
+                            null).ConfigureAwait(false);
+                }
+                catch (StorageException exception)
+                {
+                    var errorCode = exception.RequestInformation.ExtendedErrorInformation.ErrorCode;
+                    containerNotFound = errorCode == BlobErrorCodeStrings.ContainerNotFound;
+                }
+                if (containerNotFound)
+                {
+                    // if the container does not exist, create it, and make another attempt
+                    if (this.Log.IsVerbose3) this.Log.Verbose3((int)AzureProviderErrorCode.AzureBlobProvider_ContainerNotFound, "Creating container: GrainType={0} Grainid={1} ETag={2} to BlobName={3} in Container={4}", grainType, grainId, grainState.ETag, blobName, container.Name);
+                    await container.CreateIfNotExistsAsync().ConfigureAwait(false);
+
+                    await blob.UploadTextAsync(
+                        json,
+                        Encoding.UTF8,
+                        null,
                         null,
                         null).ConfigureAwait(false);
                 }

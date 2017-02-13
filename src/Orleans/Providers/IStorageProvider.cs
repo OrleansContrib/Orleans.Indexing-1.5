@@ -38,6 +38,15 @@ namespace Orleans.Storage
         /// <returns>Completion promise for the Delete operation on the specified grain.</returns>
         Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState);
     }
+    public interface IExtendedStorageProvider : IStorageProvider
+    {
+        /// <summary>Insert or Update data function for this storage provider instance.</summary>
+        /// <param name="grainType">Type of this grain [fully qualified class name]</param>
+        /// <param name="grainReference">Grain reference object for this grain.</param>
+        /// <param name="grainState">State data object to be written for this grain.</param>
+        /// <returns>Completion promise for the Write operation on the specified grain.</returns>
+        Task InsertOrUpdateStateAsync(string grainType, GrainReference grainReference, IGrainState grainState);
+    }
 
     /// <summary>
     /// Interface to be optionally implemented by storage providers to return richer exception details.
