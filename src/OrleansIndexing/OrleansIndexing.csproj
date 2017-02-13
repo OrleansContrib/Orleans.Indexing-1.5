@@ -101,6 +101,21 @@
     <Compile Include="..\Build\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Query\Interfaces\IOrleansQueryProvider.cs" />
+    <Compile Include="Query\Interfaces\IOrleansQueryable.cs" />
+    <Compile Include="Query\Interfaces\IOrleansQueryResult.cs" />
+    <Compile Include="Query\Interfaces\IOrleansQueryResultStream.cs" />
+    <Compile Include="Query\QueryResult\OrleansFirstQueryResultStream.cs" />
+    <Compile Include="Query\QueryResult\OrleansQueryResult.cs" />
+    <Compile Include="Query\QueryResult\QueryResultStreamObserver.cs" />
+    <Compile Include="Query\QueryResult\QueryFirstResultStreamObserver.cs" />
+    <Compile Include="Query\QueryResult\OrleansQueryResultStreamCaster.cs" />
+    <Compile Include="Query\QueryGrainsNode.cs" />
+    <Compile Include="Query\QueryIndexedGrainsNode.cs" />
+    <Compile Include="Query\OrleansQueryableExtensions.cs" />
+    <Compile Include="Query\QueryActiveGrainsNode.cs" />
+    <Compile Include="Query\OrleansQueryProvider.cs" />
+    <Compile Include="Query\QueryResult\OrleansQueryResultStream.cs" />
     <Compile Include="Scanners\ActiveGrainEnumeratorGrain.cs" />
     <Compile Include="Scanners\ActiveGrainScanner.cs" />
     <Compile Include="Scanners\Interfaces\IActiveGrainEnumeratorGrain.cs" />

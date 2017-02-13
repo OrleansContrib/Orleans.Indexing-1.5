@@ -52,6 +52,28 @@ namespace Orleans.Indexing
         [ReadOnly]
         [AlwaysInterleave]
         Task<bool> IsAvailable();
+
+        /// <summary>
+        /// This method retrieves the result of a lookup into the hash-index
+        /// </summary>
+        /// <param name="key">the lookup key</param>
+        /// <returns>the result of lookup into the hash-index</returns>
+        [ReadOnly]
+        [AlwaysInterleave]
+        Task Lookup(IOrleansQueryResultStream<IIndexableGrain> result, object key);
+
+        /// <summary>
+        /// This method is used for extracting the whole result of
+        /// a lookup from an AHashIndexPartitionedPerSiloBucket.
+        /// 
+        /// TODO: This should not be necessary if we could call streams
+        /// from within a SystemTarget, and the stream were efficient enough
+        /// </summary>
+        /// <param name="key">the lookup key</param>
+        /// <returns>the result of the lookup</returns>
+        [ReadOnly]
+        [AlwaysInterleave]
+        Task<IOrleansQueryResult<IIndexableGrain>> Lookup(object key);
     }
 
     /// <summary>
@@ -61,5 +83,26 @@ namespace Orleans.Indexing
     [Unordered]
     public interface IndexInterface<K,V> : IndexInterface where V : IIndexableGrain
     {
+        /// <summary>
+        /// This method retrieves the result of a lookup into the hash-index
+        /// </summary>
+        /// <param name="key">the lookup key</param>
+        /// <returns>the result of lookup into the hash-index</returns>
+        [ReadOnly]
+        [AlwaysInterleave]
+        Task Lookup(IOrleansQueryResultStream<V> result, K key);
+
+        /// <summary>
+        /// This method is used for extracting the whole result of
+        /// a lookup from an AHashIndexPartitionedPerSiloBucket.
+        /// 
+        /// TODO: This should not be necessary if we could call streams
+        /// from within a SystemTarget, and the stream were efficient enough
+        /// </summary>
+        /// <param name="key">the lookup key</param>
+        /// <returns>the result of the lookup</returns>
+        [ReadOnly]
+        [AlwaysInterleave]
+        Task<IOrleansQueryResult<V>> Lookup(K key);
     }
 }

@@ -15,6 +15,73 @@ namespace Orleans.Indexing
     public static class IndexFactory
     {
         /// <summary>
+        /// This method queries the active grains for the given
+        /// grain interface and the filter expression. The filter
+        /// expression should contain an indexed field.
+        /// </summary>
+        /// <typeparam name="TIGrain">the given grain interface
+        /// type to query over its active instances</typeparam>
+        /// <param name="gf">the grain factory instance</param>
+        /// <param name="filterExpr">the filter expression of the query</param>
+        /// <param name="queryResultObserver">the observer object to be called
+        /// on every grain found for the query</param>
+        /// <returns>the result of the query</returns>
+        public static Task GetActiveGrains<TIGrain, TProperties>(this IGrainFactory gf, Expression<Func<TProperties, bool>> filterExpr, IAsyncBatchObserver<TIGrain> queryResultObserver) where TIGrain : IIndexableGrain
+        {
+            return GrainClient.GrainFactory.GetActiveGrains<TIGrain, TProperties>()
+                                           .Where(filterExpr)
+                                           .ObserveResults(queryResultObserver);
+        }
+
+        /// <summary>
+        /// This method queries the active grains for the given
+        /// grain interface and the filter expression. The filter
+        /// expression should contain an indexed field.
+        /// </summary>
+        /// <typeparam name="TIGrain">the given grain interface
+        /// type to query over its active instances</typeparam>
+        /// <param name="gf">the grain factory instance</param>
+        /// <param name="streamProvider">the stream provider for the query results</param>
+        /// <returns>the query to lookup all active grains of a given type</returns>
+        /// <param name="filterExpr">the filter expression of the query</param>
+        /// <param name="queryResultObserver">the observer object to be called
+        /// on every grain found for the query</param>
+        /// <returns>the result of the query</returns>
+        public static Task GetActiveGrains<TIGrain, TProperties>(this IGrainFactory gf, IStreamProvider streamProvider, Expression<Func<TProperties, bool>> filterExpr, IAsyncBatchObserver<TIGrain> queryResultObserver) where TIGrain : IIndexableGrain
+        {
+            return GrainClient.GrainFactory.GetActiveGrains<TIGrain, TProperties>(streamProvider)
+                                           .Where(filterExpr)
+                                           .ObserveResults(queryResultObserver);
+        }
+
+        /// <summary>
+        /// This method queries the active grains for the given
+        /// grain interface.
+        /// </summary>
+        /// <typeparam name="TIGrain">the given grain interface
+        /// type to query over its active instances</typeparam>
+        /// <param name="gf">the grain factory instance</param>
+        /// <returns>the query to lookup all active grains of a given type</returns>
+        public static IOrleansQueryable<TIGrain, TProperty> GetActiveGrains<TIGrain, TProperty>(this IGrainFactory gf) where TIGrain : IIndexableGrain
+        {
+            return GetActiveGrains<TIGrain, TProperty>(gf, GrainClient.GetStreamProvider(Constants.INDEXING_STREAM_PROVIDER_NAME));
+        }
+
+        /// <summary>
+        /// This method queries the active grains for the given
+        /// grain interface.
+        /// </summary>
+        /// <typeparam name="TIGrain">the given grain interface
+        /// type to query over its active instances</typeparam>
+        /// <param name="gf">the grain factory instance</param>
+        /// <param name="streamProvider">the stream provider for the query results</param>
+        /// <returns>the query to lookup all active grains of a given type</returns>
+        public static IOrleansQueryable<TIGrain, TProperty> GetActiveGrains<TIGrain, TProperty>(this IGrainFactory gf, IStreamProvider streamProvider) where TIGrain : IIndexableGrain
+        {
+            return new QueryActiveGrainsNode<TIGrain, TProperty>(gf, streamProvider);
+        }
+
+        /// <summary>
         /// Gets an IndexInterface<K,V> given its name
         /// </summary>
         /// <typeparam name="K">key type of the index</typeparam>

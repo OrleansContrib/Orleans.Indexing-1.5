@@ -238,6 +238,32 @@ namespace Orleans.Indexing
         //    return Task.FromResult(State.IsUnique);
         //}
 
+        public async Task Lookup(IOrleansQueryResultStream<V> result, K key)
+        {
+            if (logger.IsVerbose) logger.Verbose("Streamed index lookup called for key = {0}", key);
+
+            if (!(State.IndexStatus == IndexStatus.Available))
+            {
+                var e = new Exception(string.Format("Index is not still available."));
+                GetLogger().Log((int)ErrorCode.IndexingIndexIsNotReadyYet, Severity.Error, "Index is not still available.", null, e);
+                throw e;
+            }
+            HashIndexSingleBucketEntry<V> entry;
+            if (State.IndexMap.TryGetValue(key, out entry) && !entry.isTentative())
+            {
+                await result.OnNextBatchAsync(entry.Values);
+                await result.OnCompletedAsync();
+            }
+            else if(State.NextBucket != null)
+            {
+                await GetNextBucket().Lookup(result, key);
+            }
+            else
+            {
+                await result.OnCompletedAsync();
+            }
+        }
+
         public async Task<V> LookupUnique(K key)
         {
             if (!(State.IndexStatus == IndexStatus.Available))
@@ -291,6 +317,41 @@ namespace Orleans.Indexing
             //    return true;
             //}
             return true;
+        }
+
+        Task IndexInterface.Lookup(IOrleansQueryResultStream<IIndexableGrain> result, object key)
+        {
+            return Lookup(result.Cast<V>(), (K)key);
+        }
+
+        public async Task<IOrleansQueryResult<V>> Lookup(K key)
+        {
+            if (logger.IsVerbose) logger.Verbose("Eager index lookup called for key = {0}", key);
+
+            if (!(State.IndexStatus == IndexStatus.Available))
+            {
+                var e = new Exception(string.Format("Index is not still available."));
+                GetLogger().Error((int)ErrorCode.IndexingIndexIsNotReadyYet, "Index is not still available.", e);
+                throw e;
+            }
+            HashIndexSingleBucketEntry<V> entry;
+            if (State.IndexMap.TryGetValue(key, out entry) && !entry.isTentative())
+            {
+                return new OrleansQueryResult<V>(entry.Values);
+            }
+            else if (State.NextBucket != null)
+            {
+                return await GetNextBucket().Lookup(key);
+            }
+            else
+            {
+                return new OrleansQueryResult<V>(Enumerable.Empty<V>());
+            }
+        }
+
+        async Task<IOrleansQueryResult<IIndexableGrain>> IndexInterface.Lookup(object key)
+        {
+            return await Lookup((K)key);
         }
 
         /// <summary>
