@@ -71,6 +71,11 @@ namespace Orleans.Runtime
             return FindOrCreateGrainId(UniqueKey.NewSystemTargetKey(systemGrainId));
         }
 
+        internal static GrainId GetSystemTargetGrainId(int typeData, string systemGrainId)
+        {
+            return FindOrCreateGrainId(UniqueKey.NewSystemTargetKey(systemGrainId, typeData));
+        }
+
         internal static GrainId GetGrainId(long typeCode, long primaryKey, string keyExt=null)
         {
             return FindOrCreateGrainId(UniqueKey.NewKey(primaryKey, 
@@ -253,6 +258,7 @@ namespace Orleans.Runtime
                     fullString = string.Format("*gcl/{0}/{1}", Key.KeyExt, idString);
                     break;
                 case UniqueKey.Category.SystemTarget:
+                case UniqueKey.Category.KeyExtSystemTarget:
                     string explicitName = Constants.SystemTargetName(this);
                     if (GetTypeCode() != 0)
                     {

@@ -23,6 +23,7 @@ namespace Orleans.Runtime
             Client = 4,
             KeyExtGrain = 6,
             GeoClient = 7,
+            KeyExtSystemTarget = 8,
         }
 
         public UInt64 N0 { get; private set; }
@@ -50,7 +51,7 @@ namespace Orleans.Runtime
 
         public bool IsSystemTargetKey
         {
-            get { return IdCategory == Category.SystemTarget; }
+            get { return IdCategory == Category.SystemTarget || IdCategory == Category.KeyExtSystemTarget; }
         }
 
         public bool IsSystemGrainKey
@@ -62,7 +63,8 @@ namespace Orleans.Runtime
         {
             get {
                 var category = IdCategory;
-                return category == Category.KeyExtGrain       
+                return category == Category.KeyExtGrain    
+                    || category == Category.KeyExtSystemTarget
                     || category == Category.GeoClient; // geo clients use the KeyExt string to specify the cluster id
             }
         }
@@ -116,7 +118,7 @@ namespace Orleans.Runtime
             // 0x0 and not useful for identification of the grain.
             if (n1 == 0 && n1 != 0)
                 throw new ArgumentException("n0 cannot be zero unless n1 is non-zero.", "n0");
-            if (category != Category.KeyExtGrain && category != Category.GeoClient && keyExt != null)
+            if (category != Category.KeyExtGrain && category != Category.GeoClient && category != Category.KeyExtSystemTarget && keyExt != null)
                 throw new ArgumentException("Only key extended grains can specify a non-null key extension.");
 
             var typeCodeData = ((ulong)category << 56) + ((ulong)typeData & 0x00FFFFFFFFFFFFFF);
@@ -155,6 +157,11 @@ namespace Orleans.Runtime
             return NewKey(n0, n1, Category.SystemTarget, typeData, null);
         }
 
+        public static UniqueKey NewSystemTargetKey(string key, long typeData)
+        {
+            return NewKey(0, 0, Category.KeyExtSystemTarget, typeData, key);
+        }
+
         public static UniqueKey NewSystemTargetKey(short systemId)
         {
             ulong n1 = unchecked((ulong)systemId);
@@ -188,7 +195,7 @@ namespace Orleans.Runtime
 
         private static void ThrowIfIsSystemTargetKey(Category category)
         {
-            if (category == Category.SystemTarget)
+            if (category == Category.SystemTarget || category == Category.KeyExtSystemTarget)
                 throw new ArgumentException(
                     "This overload of NewKey cannot be used to construct an instance of UniqueKey containing a SystemTarget id.");
         }
@@ -325,7 +332,7 @@ namespace Orleans.Runtime
         private static void ValidateKeyExt(string keyExt, UInt64 typeCodeData)
         {
             Category category = GetCategory(typeCodeData);
-            if (category == Category.KeyExtGrain)
+            if (category == Category.KeyExtGrain || category == Category.KeyExtSystemTarget)
             {
                 if (string.IsNullOrWhiteSpace(keyExt))
                 {

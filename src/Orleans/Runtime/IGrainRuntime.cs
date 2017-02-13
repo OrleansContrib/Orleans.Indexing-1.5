@@ -17,6 +17,8 @@ namespace Orleans.Runtime
         /// <returns>ServiceID Guid for this service.</returns>
         Guid ServiceId { get; }
 
+        SiloAddress SiloAddress { get; }
+
         /// <summary>
         /// A unique identifier for the current silo.
         /// There is no semantic content to this string, but it may be useful for logging.
