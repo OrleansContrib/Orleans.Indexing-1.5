@@ -53,6 +53,10 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\OrleansAzureUtils\OrleansAzureUtils.csproj">
+      <Project>{792818ef-b3f8-4ce2-9886-4808713b15c4}</Project>
+      <Name>OrleansAzureUtils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\OrleansProviders\OrleansProviders.csproj">
       <Project>{0054db14-2a92-4cc0-959e-a2c51f5e65d4}</Project>
       <Name>OrleansProviders</Name>

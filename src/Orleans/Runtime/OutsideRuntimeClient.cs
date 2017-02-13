@@ -14,6 +14,7 @@ using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
 using Orleans.Serialization;
 using Orleans.Streams;
+using Orleans.Concurrency;
 
 namespace Orleans
 {
@@ -51,6 +52,8 @@ namespace Orleans
         private static readonly TimeSpan resetTimeout = TimeSpan.FromMinutes(1);
 
         private const string BARS = "----------";
+
+        public IDictionary<Type, IDictionary<string, Tuple<object, object, object>>> Indexes { get; private set; }
         
         public IInternalGrainFactory InternalGrainFactory { get; }
 
@@ -216,6 +219,11 @@ namespace Orleans
             CurrentStreamProviderManager = streamProviderManager;
         }
 
+        private void IndexingInitialize()
+        {
+            Indexes = transport.GetIndexes(InternalGrainFactory).Result;
+        }
+
         private void LoadAdditionalAssemblies()
         {
 #if !NETSTANDARD_TODO
@@ -296,6 +304,7 @@ namespace Orleans
                 .WaitWithThrow(initTimeout);
 
             StreamingInitialize();
+            IndexingInitialize();
         }
 
         private void RunClientMessagePump(CancellationToken ct)

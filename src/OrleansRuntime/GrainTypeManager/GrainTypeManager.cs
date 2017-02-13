@@ -33,6 +33,8 @@ namespace Orleans.Runtime
 
         public IEnumerable<KeyValuePair<string, GrainTypeData>> GrainClassTypeData { get { return grainTypes; } }
 
+        public IDictionary<Type, IDictionary<string, Tuple<object, object, object>>> Indexes { get; private set; }
+
         public GrainInterfaceMap ClusterGrainInterfaceMap { get; private set; }
 
         public static void Stop()
@@ -76,6 +78,18 @@ namespace Orleans.Runtime
             InitializeInvokerMap(loader, strict);
 
             InitializeInterfaceMap();
+        }
+
+        /// <summary>
+        /// Initializes and returns the dictionary of indexes
+        /// </summary>
+        /// <param name="strict">determines the lookup strategy for
+        /// looking into the assemblies</param>
+        /// <returns></returns>
+        internal IDictionary<Type, IDictionary<string, Tuple<object, object, object>>> IndexingInitialize(bool strict = true)
+        {
+            if(Indexes == null) Indexes = loader.GetGrainClassIndexes(strict);
+            return Indexes;
         }
 
         public Dictionary<string, string> GetGrainInterfaceToClassMap()

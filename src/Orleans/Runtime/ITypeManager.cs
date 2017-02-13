@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
@@ -13,6 +15,8 @@ namespace Orleans.Runtime
         /// </summary>
         /// <returns></returns>
         Task<IGrainTypeResolver> GetClusterTypeCodeMap();
+
+        Task<IDictionary<Type, IDictionary<string, Tuple<object, object, object>>>> GetIndexes(SiloAddress silo);
 
         Task<Streams.ImplicitStreamSubscriberTable> GetImplicitStreamSubscriberTable(SiloAddress silo);
     }

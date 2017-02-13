@@ -62,5 +62,7 @@ namespace Orleans.Runtime
         IGrainTypeResolver GrainTypeResolver { get; }
         
         void BreakOutstandingMessagesToDeadSilo(SiloAddress deadSilo);
+
+        IDictionary<Type, IDictionary<string, Tuple<object,object,object>>> Indexes { get; }
     }
 }

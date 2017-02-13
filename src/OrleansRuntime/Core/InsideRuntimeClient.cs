@@ -39,6 +39,8 @@ namespace Orleans.Runtime
 
         internal readonly IConsistentRingProvider ConsistentRingProvider;
 
+        public IDictionary<Type, IDictionary<string, Tuple<object, object, object>>> Indexes { get; private set; }
+
         public InsideRuntimeClient(
             Dispatcher dispatcher,
             Catalog catalog,
@@ -698,6 +700,12 @@ namespace Orleans.Runtime
         internal void Start()
         {
             GrainTypeResolver = typeManager.GetTypeCodeMap();
+            IndexingInitialize();
+        }
+
+        private void IndexingInitialize()
+        {
+            Indexes = typeManager.IndexingInitialize();
         }
 
         public IGrainTypeResolver GrainTypeResolver { get; private set; }

@@ -1110,6 +1110,12 @@ namespace Orleans
         // Note: individual Service Fabric error codes are defined in
         // Microsoft.Orleans.ServiceFabric.Utilities.ErrorCode.
         ServiceFabricBase = Runtime + 4400,
+
+        Indexing                                    = Runtime + 4500,
+        IndexingIndexBuilderFailed                  = Indexing + 1,
+        IndexingIndexBuilderFailedToBuildIndex      = Indexing + 2,
+        IndexingIndexBuilderFailedToBuildIndexAgain = Indexing + 3,
+        IndexingIndexIsNotReadyYet                  = Indexing + 4,
     }
 }
 // ReSharper restore InconsistentNaming
