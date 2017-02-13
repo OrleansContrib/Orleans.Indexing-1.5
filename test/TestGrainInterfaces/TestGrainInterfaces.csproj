@@ -52,6 +52,8 @@
     <Compile Include="EventSourcing\ISeatReservationGrain.cs" />
     <Compile Include="GetGrainInterfaces.cs" />
     <Compile Include="IActivateDeactivateTestGrain.cs" />
+    <Compile Include="IPlayer1GrainNonFaultTolerant.cs" />
+    <Compile Include="IPlayerGrain.cs" />
     <Compile Include="IChainedGrain.cs" />
     <Compile Include="ICircularStateTestGrain.cs" />
     <Compile Include="IActivateDeactivateWatcherGrain.cs" />
