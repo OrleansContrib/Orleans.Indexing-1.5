@@ -137,6 +137,10 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\OrleansIndexing\OrleansIndexing.csproj">
+      <Project>{1BFB2B84-9D88-4E32-BF20-3702F459E386}</Project>
+      <Name>OrleansIndexing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\OrleansRuntime\OrleansRuntime.csproj">
       <Project>{6ff2004c-cdf8-479c-bf27-c6bfe8ef93e0}</Project>
       <Name>OrleansRuntime</Name>

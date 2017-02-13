@@ -142,6 +142,10 @@
       <Project>{8d937706-f6da-4d33-b0a9-24a260bd3080}</Project>
       <Name>OrleansCodeGenerator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\OrleansIndexing\OrleansIndexing.csproj">
+      <Project>{1bfb2b84-9d88-4e32-bf20-3702f459e386}</Project>
+      <Name>OrleansIndexing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\OrleansEventSourcing\OrleansEventSourcing.csproj">
       <Project>{cf7ee78b-39e1-4660-beaf-0e2606098f8c}</Project>
       <Name>OrleansEventSourcing</Name>

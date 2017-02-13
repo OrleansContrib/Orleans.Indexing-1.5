@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("OrleansTelemetryConsumers.Counters")]
 [assembly: InternalsVisibleTo("TesterInternal")]
 [assembly: InternalsVisibleTo("TestInternalGrains")]
+[assembly: InternalsVisibleTo("OrleansIndexing")]
 [assembly: InternalsVisibleTo("Orleans.NonSiloTests")]
 [assembly: InternalsVisibleTo("OrleansTestingHost")]
 [assembly: InternalsVisibleTo("Tester.AzureUtils")]

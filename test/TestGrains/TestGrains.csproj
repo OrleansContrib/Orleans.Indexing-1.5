@@ -140,6 +140,10 @@
       <Project>{cf7ee78b-39e1-4660-beaf-0e2606098f8c}</Project>
       <Name>OrleansEventSourcing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\OrleansIndexing\OrleansIndexing.csproj">
+      <Project>{1bfb2b84-9d88-4e32-bf20-3702f459e386}</Project>
+      <Name>OrleansIndexing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\OrleansProviders\OrleansProviders.csproj">
       <Project>{0054DB14-2A92-4CC0-959E-A2C51F5E65D4}</Project>
       <Name>OrleansProviders</Name>

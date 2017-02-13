@@ -30,6 +30,10 @@ namespace Orleans.Runtime
 
         public const string TroubleshootingHelpLink = "https://aka.ms/orleans-troubleshooting";
 
+        public const string INDEXING_STORAGE_PROVIDER_NAME = "IndexingStorageProvider";
+        public const string INDEXING_WORKFLOWQUEUE_STORAGE_PROVIDER_NAME = "IndexingWorkflowQueueStorageProvider";
+        public const string INDEXING_STREAM_PROVIDER_NAME = "IndexingStreamProvider";
+
         public static readonly GrainId DirectoryServiceId = GrainId.GetSystemTargetGrainId(10);
         public static readonly GrainId DirectoryCacheValidatorId = GrainId.GetSystemTargetGrainId(11);
         public static readonly GrainId SiloControlId = GrainId.GetSystemTargetGrainId(12);
@@ -44,6 +48,10 @@ namespace Orleans.Runtime
         public static readonly GrainId StreamProviderManagerAgentSystemTargetId = GrainId.GetSystemTargetGrainId(25);
         public static readonly GrainId TestHooksSystemTargetId = GrainId.GetSystemTargetGrainId(26);
         public static readonly GrainId ProtocolGatewayId = GrainId.GetSystemTargetGrainId(27);
+
+        public const int INDEX_WORKFLOW_QUEUE_HANDLER_SYSTEM_TARGET_TYPE_CODE = 251;
+        public const int INDEX_WORKFLOW_QUEUE_SYSTEM_TARGET_TYPE_CODE = 252;
+        public const int HASH_INDEX_PARTITIONED_PER_SILO_BUCKET_SYSTEM_TARGET_TYPE_CODE = 253;
 
         public const int PULLING_AGENTS_MANAGER_SYSTEM_TARGET_TYPE_CODE = 254;
         public const int PULLING_AGENT_SYSTEM_TARGET_TYPE_CODE = 255;
@@ -92,6 +100,9 @@ namespace Orleans.Runtime
 
         private static readonly Dictionary<int, string> nonSingletonSystemTargetNames = new Dictionary<int, string>
         {
+            {INDEX_WORKFLOW_QUEUE_HANDLER_SYSTEM_TARGET_TYPE_CODE, "IndexWorkflowQueueHandler"},
+            {INDEX_WORKFLOW_QUEUE_SYSTEM_TARGET_TYPE_CODE, "IndexWorkflowQueue"},
+            {HASH_INDEX_PARTITIONED_PER_SILO_BUCKET_SYSTEM_TARGET_TYPE_CODE, "HashIndexPartiotionedPerSiloBucket"},
             {PULLING_AGENT_SYSTEM_TARGET_TYPE_CODE, "PullingAgentSystemTarget"},
             {PULLING_AGENTS_MANAGER_SYSTEM_TARGET_TYPE_CODE, "PullingAgentsManagerSystemTarget"},
         };
