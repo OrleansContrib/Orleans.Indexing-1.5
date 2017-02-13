@@ -62,12 +62,41 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Interfaces\IIndexableGrain.cs" />
+    <Compile Include="Core\Annotations\IndexType.cs" />
+    <Compile Include="Core\Annotations\AIndexAttribute.cs" />
+    <Compile Include="Core\Annotations\IndexAttribute.cs" />
+    <Compile Include="Core\IndexableGrainNonFaultTolerant.cs" />
+    <Compile Include="Core\IndexOperationType.cs" />
+    <Compile Include="Core\IndexBuilder.cs" />
+    <Compile Include="Core\MemberUpdateImpl\MemberUpdateReverseTentative.cs" />
+    <Compile Include="Core\MemberUpdateImpl\MemberUpdateTentative.cs" />
     <Compile Include="Core\Utils\SiloUtils.cs" />
+    <Compile Include="Core\Utils\IndexUtils.cs" />
+    <Compile Include="Core\IndexFactory.cs" />
+    <Compile Include="Core\IndexHandler.cs" />
+    <Compile Include="Core\IndexRegistry.cs" />
+    <Compile Include="Core\IndexUpdateGenerator.cs" />
+    <Compile Include="Core\Interfaces\IIndexBuilder.cs" />
+    <Compile Include="Core\Interfaces\IIndexableGrain.cs" />
+    <Compile Include="Core\Interfaces\IIndexUpdateGenerator.cs" />
+    <Compile Include="Core\Interfaces\IMemberUpdate.cs" />
+    <Compile Include="Core\MemberUpdateImpl\MemberUpdate.cs" />
     <Compile Include="Core\Utils\TypeCodeMapper.cs" />
+    <Compile Include="Exceptions\UniquenessConstraintViolatedException.cs" />
+    <Compile Include="Extensions\IndexExtensions.cs" />
     <Compile Include="Extensions\GrainExtensions.cs" />
     <Compile Include="Extensions\GrainFactoryExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Indexes\ActiveIndexes\AHashIndexSingleBucketImpl.cs" />
+    <Compile Include="Indexes\ActiveIndexes\Interfaces\AHashIndexSingleBucket.cs" />
+    <Compile Include="Indexes\HashIndexSingleBucket.cs" />
+    <Compile Include="Indexes\HashIndexBucketUtils.cs" />
+    <Compile Include="Indexes\HashIndexBucketState.cs" />
+    <Compile Include="Indexes\Interfaces\HashIndexInterface.cs" />
+    <Compile Include="Indexes\Interfaces\HashIndexSingleBucketInterface.cs" />
+    <Compile Include="Indexes\Interfaces\IndexInterface.cs" />
+    <Compile Include="Indexes\Interfaces\RangeIndexInterface.cs" />
+    <Compile Include="Core\IndexMetaData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\Build\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>

@@ -9,11 +9,12 @@ namespace UnitTests.GrainInterfaces
     public class Player1PropertiesNonFaultTolerant : PlayerProperties
     {
         public int Score { get; set; }
-        
+
+        [AIndex(IsEager : true)]
         public string Location { get; set; }
     }
 
-    public interface IPlayer1GrainNonFaultTolerant : IPlayerGrain
+    public interface IPlayer1GrainNonFaultTolerant : IPlayerGrain, IIndexableGrain<Player1PropertiesNonFaultTolerant>
     {
     }
 }
