@@ -51,6 +51,7 @@
     <Compile Include="IndexingTests\NoIndexingTests.cs" />
     <Compile Include="IndexingTests\ActiveGrainEnumerationTests.cs" />
     <Compile Include="IndexingTests\IndexingTestUtils.cs" />
+    <Compile Include="IndexingTests\SimpleIndexingTestsTwoSilos.cs" />
     <Compile Include="EventSourcingTests\AccountGrainTests.cs" />
     <Compile Include="EventSourcingTests\ChatGrainTests.cs" />
     <Compile Include="EventSourcingTests\CountersGrainPerfTests.cs" />

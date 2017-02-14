@@ -58,6 +58,7 @@
     <Compile Include="Player5GrainNonFaultTolerant.cs" />
     <Compile Include="PlayerGrainNonFaultTolerant.cs" />
     <Compile Include="Player3GrainNonFaultTolerant.cs" />
+    <Compile Include="Player2GrainNonFaultTolerant.cs" />
     <Compile Include="Player1GrainNonFaultTolerant.cs" />
     <Compile Include="ChainedGrain.cs" />
     <Compile Include="ClusterTestGrains.cs" />

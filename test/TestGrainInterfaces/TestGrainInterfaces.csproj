@@ -53,6 +53,7 @@
     <Compile Include="GetGrainInterfaces.cs" />
     <Compile Include="IActivateDeactivateTestGrain.cs" />
     <Compile Include="IPlayer1GrainNonFaultTolerant.cs" />
+    <Compile Include="IPlayer2GrainNonFaultTolerant.cs" />
     <Compile Include="IPlayer3GrainNonFaultTolerant.cs" />
     <Compile Include="IPlayer4GrainNonFaultTolerant.cs" />
     <Compile Include="IPlayer5GrainNonFaultTolerant.cs" />

@@ -94,6 +94,44 @@ namespace UnitTests.IndexingTests
         }
 
         /// <summary>
+        /// Tests basic functionality of AHashIndexPartitionedPerSiloImpl with 1 Silo
+        /// </summary>
+        [Fact, TestCategory("BVT"), TestCategory("Indexing")]
+        public async Task Test_Indexing_IndexLookup2()
+        {
+            //await GrainClient.GrainFactory.DropAllIndexes<IPlayerGrain>();
+
+            IPlayer2GrainNonFaultTolerant p1 = GrainClient.GrainFactory.GetGrain<IPlayer2GrainNonFaultTolerant>(1);
+            await p1.SetLocation("Tehran");
+
+            //bool isLocIndexCreated = await GrainClient.GrainFactory.CreateAndRegisterIndex<HashIndexSingleBucketInterface<string, IPlayerGrain>, PlayerLocIndexGen>("__GetLocation");
+            //Assert.IsTrue(isLocIndexCreated);
+
+            IPlayer2GrainNonFaultTolerant p2 = GrainClient.GrainFactory.GetGrain<IPlayer2GrainNonFaultTolerant>(2);
+            IPlayer2GrainNonFaultTolerant p3 = GrainClient.GrainFactory.GetGrain<IPlayer2GrainNonFaultTolerant>(3);
+
+            await p2.SetLocation("Tehran");
+            await p3.SetLocation("Yazd");
+
+            IndexInterface<string, IPlayer2GrainNonFaultTolerant> locIdx = GrainClient.GrainFactory.GetIndex<string, IPlayer2GrainNonFaultTolerant>("__Location");
+
+            while (!await locIdx.IsAvailable()) Thread.Sleep(50);
+
+            Assert.Equal(2, await IndexingTestUtils.CountPlayersStreamingIn<IPlayer2GrainNonFaultTolerant, Player2PropertiesNonFaultTolerant>("Tehran", output));
+
+            await p2.Deactivate();
+
+            Thread.Sleep(1000);
+
+            Assert.Equal(1, await IndexingTestUtils.CountPlayersStreamingIn<IPlayer2GrainNonFaultTolerant, Player2PropertiesNonFaultTolerant>("Tehran", output));
+
+            p2 = GrainClient.GrainFactory.GetGrain<IPlayer2GrainNonFaultTolerant>(2);
+            Assert.Equal("Tehran", await p2.GetLocation());
+
+            Assert.Equal(2, await IndexingTestUtils.CountPlayersStreamingIn<IPlayer2GrainNonFaultTolerant, Player2PropertiesNonFaultTolerant>("Tehran", output));
+        }
+
+        /// <summary>
         /// Tests basic functionality of HashIndexPartitionedPerKey
         /// </summary>
         [Fact, TestCategory("BVT"), TestCategory("Indexing")]

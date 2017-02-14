@@ -95,11 +95,15 @@
     <Compile Include="Indexes\ActiveIndexes\Interfaces\AHashIndexSingleBucket.cs" />
     <Compile Include="Indexes\HashIndexPartitionedPerKeyBucket.cs" />
     <Compile Include="Indexes\HashIndexPartitionedPerKey.cs" />
+    <Compile Include="Indexes\ActiveIndexes\AHashIndexPartitionedPerSiloImpl.cs" />
+    <Compile Include="Indexes\ActiveIndexes\AHashIndexPartitionedPerSiloBucketImpl.cs" />
     <Compile Include="Indexes\HashIndexSingleBucket.cs" />
     <Compile Include="Indexes\HashIndexBucketUtils.cs" />
     <Compile Include="Indexes\HashIndexBucketState.cs" />
     <Compile Include="Indexes\Interfaces\HashIndexInterface.cs" />
+    <Compile Include="Indexes\ActiveIndexes\Interfaces\AHashIndexPartitionedPerSilo.cs" />
     <Compile Include="Indexes\Interfaces\HashIndexPartitionedPerKeyBucketInterface.cs" />
+    <Compile Include="Indexes\ActiveIndexes\Interfaces\AHashIndexPartitionedPerSiloBucket.cs" />
     <Compile Include="Indexes\Interfaces\HashIndexSingleBucketInterface.cs" />
     <Compile Include="Indexes\Interfaces\IndexInterface.cs" />
     <Compile Include="Indexes\Interfaces\RangeIndexInterface.cs" />

@@ -17,6 +17,14 @@ namespace Orleans.Indexing
         /// </summary>
         public static Task<bool> ApplyIndexUpdateBatch(this IndexInterface index, Immutable<IDictionary<IIndexableGrain, IList<IMemberUpdate>>> iUpdates, bool isUniqueIndex, IndexMetaData idxMetaData, SiloAddress siloAddress = null)
         {
+            if (index is AHashIndexPartitionedPerSilo)
+            {
+                AHashIndexPartitionedPerSiloBucket bucketInCurrentSilo = InsideRuntimeClient.Current.InternalGrainFactory.GetSystemTarget<AHashIndexPartitionedPerSiloBucket>(
+                    GetAHashIndexPartitionedPerSiloGrainID(IndexUtils.GetIndexNameFromIndexGrain((IAddressable)index), index.GetType().GetGenericArguments()[1]),
+                    siloAddress
+                );
+                return bucketInCurrentSilo.DirectApplyIndexUpdateBatch(iUpdates, isUniqueIndex, idxMetaData/*, siloAddress*/);
+            }
             return index.DirectApplyIndexUpdateBatch(iUpdates, isUniqueIndex, idxMetaData, siloAddress);
         }
 
@@ -26,6 +34,14 @@ namespace Orleans.Indexing
         /// </summary>
         internal static Task<bool> ApplyIndexUpdate(this IndexInterface index, IIndexableGrain updatedGrain, Immutable<IMemberUpdate> update, bool isUniqueIndex, IndexMetaData idxMetaData, SiloAddress siloAddress = null)
         {
+            if (index is AHashIndexPartitionedPerSilo)
+            {
+                AHashIndexPartitionedPerSiloBucket bucketInCurrentSilo = InsideRuntimeClient.Current.InternalGrainFactory.GetSystemTarget<AHashIndexPartitionedPerSiloBucket>(
+                    GetAHashIndexPartitionedPerSiloGrainID(IndexUtils.GetIndexNameFromIndexGrain((IAddressable )index), index.GetType().GetGenericArguments()[1]),
+                    siloAddress
+                );
+                return bucketInCurrentSilo.DirectApplyIndexUpdate(updatedGrain, update, isUniqueIndex, idxMetaData/*, siloAddress*/);
+            }
             return index.DirectApplyIndexUpdate(updatedGrain, update, isUniqueIndex, idxMetaData, siloAddress);
         }
 
