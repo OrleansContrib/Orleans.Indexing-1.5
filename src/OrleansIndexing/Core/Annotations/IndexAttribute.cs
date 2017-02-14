@@ -8,6 +8,7 @@ namespace Orleans.Indexing
         public Type IndexType { get; protected set; }
         public bool IsUnique { get; protected set; }
         public bool IsEager { get; protected set; }
+        public int MaxEntriesPerBucket { get; protected set; }
 
         public IndexAttribute() : this(false)
         {
@@ -17,11 +18,12 @@ namespace Orleans.Indexing
         {
         }
 
-        public IndexAttribute(Type IndexType, bool IsEager = false, bool IsUnique = false)
+        public IndexAttribute(Type IndexType, bool IsEager = false, bool IsUnique = false, int MaxEntriesPerBucket = -1)
         {
             this.IndexType = IndexType;
             this.IsUnique = IsUnique;
             this.IsEager = IsEager;
+            this.MaxEntriesPerBucket = MaxEntriesPerBucket;
         }
     }
 }

@@ -47,6 +47,8 @@
     <Compile Include="CancellationTests\GrainCancellationTokenTests.cs" />
     <Compile Include="ClientConnectionTests\ClientDisconnectionEventTests.cs" />
     <Compile Include="CollectionFixtures.cs" />
+    <Compile Include="IndexingTests\ChainedBucketIndexingTestsSingleSilo.cs" />
+    <Compile Include="IndexingTests\ChainedBucketIndexingTestsTwoSilos.cs" />
     <Compile Include="IndexingTests\SimpleIndexingTestsSingleSilo.cs" />
     <Compile Include="IndexingTests\NoIndexingTests.cs" />
     <Compile Include="IndexingTests\ActiveGrainEnumerationTests.cs" />

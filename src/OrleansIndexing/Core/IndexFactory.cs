@@ -149,7 +149,7 @@ namespace Orleans.Indexing
         /// <param name="idxType"></param>
         /// <param name="indexName"></param>
         /// <returns></returns>
-        internal static Tuple<object, object, object> CreateIndex(this IGrainFactory gf, Type idxType, string indexName, bool isUniqueIndex, bool isEager, PropertyInfo indexedProperty)
+        internal static Tuple<object, object, object> CreateIndex(this IGrainFactory gf, Type idxType, string indexName, bool isUniqueIndex, bool isEager, int maxEntriesPerBucket, PropertyInfo indexedProperty)
         {
             Type iIndexType = idxType.GetGenericType(typeof(IndexInterface<,>));
             if (iIndexType != null)
@@ -186,7 +186,7 @@ namespace Orleans.Indexing
                     throw new Exception(string.Format("{0} is neither a grain nor a class. Index \"{1}\" cannot be created.", idxType, indexName));
                 }
 
-                return Tuple.Create((object)index, (object)new IndexMetaData(idxType, isUniqueIndex, isEager), (object)CreateIndexUpdateGenFromProperty(indexedProperty));
+                return Tuple.Create((object)index, (object)new IndexMetaData(idxType, isUniqueIndex, isEager, maxEntriesPerBucket), (object)CreateIndexUpdateGenFromProperty(indexedProperty));
             }
             else
             {

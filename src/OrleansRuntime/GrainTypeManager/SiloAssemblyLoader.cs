@@ -134,9 +134,10 @@ namespace Orleans.Runtime
         private static Type indexAttributeType;
         private static PropertyInfo indexTypeProperty;
         private static Type indexFactoryType;
-        private static Func<IGrainFactory, Type, string, bool, bool, PropertyInfo, Tuple<object, object, object>> createIndexMethod;
+        private static Func<IGrainFactory, Type, string, bool, bool, int, PropertyInfo, Tuple<object, object, object>> createIndexMethod;
         private static PropertyInfo isEagerProperty;
         private static PropertyInfo isUniqueProperty;
+        private static PropertyInfo maxEntriesPerBucketProperty;
 
         /// <summary>
         /// This method crawls the assemblies and looks for the index
@@ -159,13 +160,14 @@ namespace Orleans.Runtime
                 indexAttributeType = Type.GetType("Orleans.Indexing.IndexAttribute" + AssemblySeparator + OrleansIndexingAssembly);
                 indexTypeProperty = indexAttributeType.GetProperty("IndexType");
                 indexFactoryType = Type.GetType("Orleans.Indexing.IndexFactory" + AssemblySeparator + OrleansIndexingAssembly);
-                createIndexMethod = (Func<IGrainFactory, Type, string, bool, bool, PropertyInfo, Tuple<object, object, object>>)Delegate.CreateDelegate(
-                                        typeof(Func<IGrainFactory, Type, string, bool, bool, PropertyInfo, Tuple<object, object, object>>),
+                createIndexMethod = (Func<IGrainFactory, Type, string, bool, bool, int, PropertyInfo, Tuple<object, object, object>>)Delegate.CreateDelegate(
+                                        typeof(Func<IGrainFactory, Type, string, bool, bool, int, PropertyInfo, Tuple<object, object, object>>),
                                         indexFactoryType.GetMethod("CreateIndex", BindingFlags.Static | BindingFlags.NonPublic));
                 isEagerProperty = indexAttributeType.GetProperty("IsEager");
                 isUniqueProperty = indexAttributeType.GetProperty("IsUnique");
+                maxEntriesPerBucketProperty = indexAttributeType.GetProperty("MaxEntriesPerBucket");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 //indexing project is not added as a dependency.
                 return result;
@@ -245,7 +247,8 @@ namespace Orleans.Runtime
                         //if it's not eager, then it's configured to be lazily updated
                         isEagerlyUpdated = (bool)isEagerProperty.GetValue(indexAttr);
                         bool isUnique = (bool)isUniqueProperty.GetValue(indexAttr);
-                        indexesOnGrain.Add(indexName, createIndexMethod(InsideRuntimeClient.Current.ConcreteGrainFactory, indexType, indexName, isUnique, isEagerlyUpdated, p));
+                        int maxEntriesPerBucket = (int)maxEntriesPerBucketProperty.GetValue(indexAttr);
+                        indexesOnGrain.Add(indexName, createIndexMethod(InsideRuntimeClient.Current.ConcreteGrainFactory, indexType, indexName, isUnique, isEagerlyUpdated, maxEntriesPerBucket, p));
                     }
                 }
                 result.Add(userDefinedIGrain, indexesOnGrain);

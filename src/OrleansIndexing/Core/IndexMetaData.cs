@@ -17,17 +17,19 @@ namespace Orleans.Indexing
         private Type _indexType;
         private bool _isUniqueIndex;
         private bool _isEager;
+        private int _maxEntriesPerBucket;
 
         /// <summary>
         /// Constructs an IndexMetaData, which currently only
         /// consists of the type of the index
         /// </summary>
         /// <param name="indexType">the type of the index</param>
-        public IndexMetaData(Type indexType, bool isUniqueIndex, bool isEager)
+        public IndexMetaData(Type indexType, bool isUniqueIndex, bool isEager, int maxEntriesPerBucket)
         {
             _indexType = indexType;
             _isUniqueIndex = isUniqueIndex;
             _isEager = isEager;
+            _maxEntriesPerBucket = maxEntriesPerBucket;
         }
         
         /// <returns>the type of the index</returns>
@@ -70,6 +72,21 @@ namespace Orleans.Indexing
         public bool IsEager()
         {
             return _isEager;
+        }
+
+        public int GetMaxEntriesPerBucket()
+        {
+            return _maxEntriesPerBucket;
+        }
+
+        public bool IsChainedBuckets()
+        {
+            return _maxEntriesPerBucket > 0;
+        }
+
+        public bool IsCreatingANewBucketNecessary(int currentSize)
+        {
+            return IsChainedBuckets() && currentSize >= _maxEntriesPerBucket;
         }
     }
 }

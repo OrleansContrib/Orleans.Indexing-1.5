@@ -13,7 +13,7 @@ namespace Orleans.Indexing
         {
         }
 
-        public AIndexAttribute(IndexType type, bool IsEager = false)
+        public AIndexAttribute(IndexType type, bool IsEager = false, int MaxEntriesPerBucket = -1)
         {
             switch (type)
             {
@@ -39,6 +39,7 @@ namespace Orleans.Indexing
             //activate PP will cause a violation of the A-index on email.
             //This implies we should disallow such indexes.
             this.IsUnique = false;
+            this.MaxEntriesPerBucket = MaxEntriesPerBucket;
         }
     }
 }

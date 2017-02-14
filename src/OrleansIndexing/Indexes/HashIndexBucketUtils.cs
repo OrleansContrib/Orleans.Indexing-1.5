@@ -101,6 +101,8 @@ namespace Orleans.Indexing
                 }
                 else
                 {
+                    if(idxMetaData.IsChainedBuckets())
+                        return false; //not found in this bucket
                     //Insert
                     if (State.IndexMap.TryGetValue(aftImg, out aftEntry))
                     {
@@ -123,6 +125,10 @@ namespace Orleans.Indexing
                     }
                     else
                     {
+                        if (idxMetaData.IsCreatingANewBucketNecessary(State.IndexMap.Count()))
+                        {
+                            return false;
+                        }
                         aftEntry = new HashIndexSingleBucketEntry<V>();
                         aftEntry.Add(updatedGrain, isTentativeUpdate, isUniqueIndex);
                         State.IndexMap.Add(aftImg, aftEntry);
@@ -153,6 +159,10 @@ namespace Orleans.Indexing
                 }
                 else
                 {
+                    if (idxMetaData.IsCreatingANewBucketNecessary(State.IndexMap.Count()))
+                    {
+                        return false;  //the bucket is full
+                    }
                     aftEntry = new HashIndexSingleBucketEntry<V>();
                     aftEntry.Add(updatedGrain, isTentativeUpdate, isUniqueIndex);
                     State.IndexMap.Add(aftImg, aftEntry);
@@ -169,6 +179,10 @@ namespace Orleans.Indexing
                     {
                         fixIndexUnavailableOnDelete = true;
                     }
+                }
+                else if(idxMetaData.IsChainedBuckets())
+                {
+                    return false; //not found in this bucket
                 }
             }
             return true;
