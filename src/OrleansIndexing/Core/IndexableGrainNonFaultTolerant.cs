@@ -428,6 +428,8 @@ namespace Orleans.Indexing
                 foreach (KeyValuePair<string, Tuple<object, object, object>> kvp in iUpdateGens)
                 {
                     var idxInfo = kvp.Value;
+                    if (!onlyUpdateActiveIndexes || !(idxInfo.Item1 is InitializedIndex))
+                    {
                         IMemberUpdate mu = isOnActivate ? ((IIndexUpdateGenerator)idxInfo.Item3).CreateMemberUpdate(befImgs[kvp.Key])
                                                         : ((IIndexUpdateGenerator)idxInfo.Item3).CreateMemberUpdate(indexableProperties, befImgs[kvp.Key]);
                         if (mu.GetOperationType() != IndexOperationType.None)
@@ -445,6 +447,7 @@ namespace Orleans.Indexing
                             onlyUniqueIndexesWereUpdated = onlyUniqueIndexesWereUpdated && isUniqueIndex;
                             if (isUniqueIndex) ++numberOfUniqueIndexesUpdated;
                         }
+                    }
                 }
             }
 

@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Annotations\DSMIndexAttribute.cs" />
+    <Compile Include="Core\Annotations\IIndexAttribute.cs" />
     <Compile Include="Core\Annotations\IndexType.cs" />
     <Compile Include="Core\Annotations\AIndexAttribute.cs" />
     <Compile Include="Core\Annotations\IndexAttribute.cs" />
@@ -102,6 +103,12 @@
     <Compile Include="Indexes\HashIndexSingleBucket.cs" />
     <Compile Include="Indexes\HashIndexBucketUtils.cs" />
     <Compile Include="Indexes\HashIndexBucketState.cs" />
+    <Compile Include="Indexes\InitializedIndexes\IHashIndexPartitionedPerKeyBucketImpl.cs" />
+    <Compile Include="Indexes\InitializedIndexes\IHashIndexPartitionedPerKey.cs" />
+    <Compile Include="Indexes\InitializedIndexes\IHashIndexSingleBucketImpl.cs" />
+    <Compile Include="Indexes\InitializedIndexes\Interfaces\IHashIndexPartitionedPerKeyBucket.cs" />
+    <Compile Include="Indexes\InitializedIndexes\Interfaces\IHashIndexSingleBucket.cs" />
+    <Compile Include="Indexes\InitializedIndexes\Interfaces\InitializedIndex.cs" />
     <Compile Include="Indexes\Interfaces\HashIndexInterface.cs" />
     <Compile Include="Indexes\ActiveIndexes\Interfaces\AHashIndexPartitionedPerSilo.cs" />
     <Compile Include="Indexes\Interfaces\HashIndexPartitionedPerKeyBucketInterface.cs" />
