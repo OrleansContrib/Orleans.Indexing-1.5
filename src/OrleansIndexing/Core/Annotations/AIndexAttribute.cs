@@ -20,6 +20,9 @@ namespace Orleans.Indexing
                 case Indexing.IndexType.HashIndexSingleBucket:
                     IndexType = typeof(AHashIndexSingleBucket<,>);
                     break;
+                case Indexing.IndexType.HashIndexPartitionedByKeyHash:
+                    IndexType = typeof(AHashIndexPartitionedPerKey<,>);
+                    break;
                 default:
                     IndexType = typeof(AHashIndexSingleBucket<,>);
                     break;

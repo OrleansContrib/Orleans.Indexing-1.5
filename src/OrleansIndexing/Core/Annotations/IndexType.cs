@@ -7,6 +7,7 @@ namespace Orleans.Indexing
     /// </summary>
     public enum IndexType
     {
-        HashIndexSingleBucket
+        HashIndexSingleBucket,
+        HashIndexPartitionedByKeyHash
     }
 }

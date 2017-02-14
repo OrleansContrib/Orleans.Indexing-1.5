@@ -92,5 +92,43 @@ namespace UnitTests.IndexingTests
 
             Assert.Equal(2, await IndexingTestUtils.CountPlayersStreamingIn<IPlayer1GrainNonFaultTolerant, Player1PropertiesNonFaultTolerant>("Seattle", output));
         }
+
+        /// <summary>
+        /// Tests basic functionality of HashIndexPartitionedPerKey
+        /// </summary>
+        [Fact, TestCategory("BVT"), TestCategory("Indexing")]
+        public async Task Test_Indexing_IndexLookup4()
+        {
+            //await GrainClient.GrainFactory.DropAllIndexes<IPlayerGrain>();
+
+            IPlayer3GrainNonFaultTolerant p1 = GrainClient.GrainFactory.GetGrain<IPlayer3GrainNonFaultTolerant>(1);
+            await p1.SetLocation("Seattle");
+
+            //bool isLocIndexCreated = await GrainClient.GrainFactory.CreateAndRegisterIndex<HashIndexSingleBucketInterface<string, IPlayerGrain>, PlayerLocIndexGen>("__Location");
+            //Assert.IsTrue(isLocIndexCreated);
+
+            IPlayer3GrainNonFaultTolerant p2 = GrainClient.GrainFactory.GetGrain<IPlayer3GrainNonFaultTolerant>(2);
+            IPlayer3GrainNonFaultTolerant p3 = GrainClient.GrainFactory.GetGrain<IPlayer3GrainNonFaultTolerant>(3);
+
+            await p2.SetLocation("Seattle");
+            await p3.SetLocation("San Fransisco");
+
+            IndexInterface<string, IPlayer3GrainNonFaultTolerant> locIdx = GrainClient.GrainFactory.GetIndex<string, IPlayer3GrainNonFaultTolerant>("__Location");
+
+            while (!await locIdx.IsAvailable()) Thread.Sleep(50);
+
+            Assert.Equal(2, await IndexingTestUtils.CountPlayersStreamingIn<IPlayer3GrainNonFaultTolerant, Player3PropertiesNonFaultTolerant>("Seattle", output));
+
+            await p2.Deactivate();
+
+            Thread.Sleep(1000);
+
+            Assert.Equal(1, await IndexingTestUtils.CountPlayersStreamingIn<IPlayer3GrainNonFaultTolerant, Player3PropertiesNonFaultTolerant>("Seattle", output));
+
+            p2 = GrainClient.GrainFactory.GetGrain<IPlayer3GrainNonFaultTolerant>(2);
+            Assert.Equal("Seattle", await p2.GetLocation());
+
+            Assert.Equal(2, await IndexingTestUtils.CountPlayersStreamingIn<IPlayer3GrainNonFaultTolerant, Player3PropertiesNonFaultTolerant>("Seattle", output));
+        }
     }
 }
