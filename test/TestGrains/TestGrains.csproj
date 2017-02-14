@@ -54,15 +54,21 @@
     </Compile>
     <Compile Include="AsyncSimpleGrain.cs" />
     <Compile Include="CatalogTestGrain.cs" />
+    <Compile Include="Player1Grain.cs" />
     <Compile Include="Player1GrainNonFaultTolerantLazy.cs" />
+    <Compile Include="Player2Grain.cs" />
     <Compile Include="Player2GrainNonFaultTolerantLazy.cs" />
+    <Compile Include="Player3Grain.cs" />
     <Compile Include="Player3GrainNonFaultTolerantLazy.cs" />
+    <Compile Include="Player4Grain.cs" />
     <Compile Include="Player4GrainNonFaultTolerant.cs" />
     <Compile Include="Player4GrainNonFaultTolerantLazy.cs" />
     <Compile Include="PlayerChain1Grain.cs" />
     <Compile Include="PlayerDocDBGrain.cs" />
+    <Compile Include="Player5Grain.cs" />
     <Compile Include="Player5GrainNonFaultTolerant.cs" />
     <Compile Include="Player5GrainNonFaultTolerantLazy.cs" />
+    <Compile Include="PlayerGrain.cs" />
     <Compile Include="PlayerGrainNonFaultTolerant.cs" />
     <Compile Include="Player3GrainNonFaultTolerant.cs" />
     <Compile Include="Player2GrainNonFaultTolerant.cs" />

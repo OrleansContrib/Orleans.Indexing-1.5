@@ -64,7 +64,11 @@ namespace Orleans.Indexing
             }
             return _props;
         }
-        
+
+        //a cache for the work-flow queues, one for each grain interface type
+        //that the current IndexableGrain implements
+        internal virtual IDictionary<Type, IIndexWorkflowQueue> WorkflowQueues { get; set; }
+
         /// <summary>
         /// Upon activation, the list of index update generators
         /// is retrieved from the index handler. It is cached in
@@ -257,6 +261,10 @@ namespace Orleans.Indexing
                         throw ex;
                     }
                 }
+
+                //if indexes are updated eagerly
+                if (updateIndexesEagerly)
+                {
                     //Case 1: if only unique indexes were updated, then their update
                     //is already processed before and the only thing remaining is to
                     //save the grain state if requested
@@ -281,6 +289,19 @@ namespace Orleans.Indexing
                     {
                         await ApplyIndexUpdatesEagerly(iGrainTypes, thisGrain, updates, false, isThereAtMostOneUniqueIndex);
                     }
+                }
+                //Otherwise, if indexes are updated lazily
+                else
+                {
+                    //update the indexes lazily
+                    ApplyIndexUpdatesLazilyWithoutWait(updates, iGrainTypes, thisGrain, Guid.NewGuid());
+
+                    //final, the grain state is persisted if requested
+                    if (writeStateIfConstraintsAreNotViolated)
+                    {
+                        await WriteBaseStateAsync();
+                    }
+                }
                 //if everything was successful, the before images are updated
                 UpdateBeforeImages(updates);
             }
@@ -297,6 +318,58 @@ namespace Orleans.Indexing
                                                        IDictionary<string, IMemberUpdate> updates)
         {
             return ApplyIndexUpdatesEagerly(iGrainTypes, thisGrain, MemberUpdateReverseTentative.Reverse(updates), true, false, false);
+        }
+
+        /// <summary>
+        /// Lazily Applies updates to the indexes defined on this grain
+        /// 
+        /// The lazy update involves adding a work-flow record to the
+        /// corresponding IIndexWorkflowQueue for this grain.
+        /// </summary>
+        /// <param name="updates">the dictionary of updates for each index</param>
+        /// <param name="iGrainTypes">the grain interface type implemented by this grain</param>
+        /// <param name="thisGrain">the grain reference for the current grain</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ApplyIndexUpdatesLazilyWithoutWait(IDictionary<string, IMemberUpdate> updates,
+                                             IList<Type> iGrainTypes,
+                                             IIndexableGrain thisGrain,
+                                             Guid workflowID)
+        {
+            ApplyIndexUpdatesLazily(updates, iGrainTypes, thisGrain, workflowID).Ignore();
+        }
+
+        /// <summary>
+        /// Lazily Applies updates to the indexes defined on this grain
+        /// 
+        /// The lazy update involves adding a work-flow record to the
+        /// corresponding IIndexWorkflowQueue for this grain.
+        /// </summary>
+        /// <param name="updates">the dictionary of updates for each index</param>
+        /// <param name="iGrainTypes">the grain interface type implemented by this grain</param>
+        /// <param name="thisGrain">the grain reference for the current grain</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected Task ApplyIndexUpdatesLazily(IDictionary<string, IMemberUpdate> updates,
+                                             IList<Type> iGrainTypes,
+                                             IIndexableGrain thisGrain,
+                                             Guid workflowID)
+        {
+            if (iGrainTypes.Count() == 1)
+            {
+                IIndexWorkflowQueue workflowQ = GetWorkflowQueue(iGrainTypes[0]);
+                return workflowQ.AddToQueue(new IndexWorkflowRecord(workflowID, thisGrain, updates).AsImmutable());
+            }
+            else
+            {
+                Task[] tasks = new Task[iGrainTypes.Count];
+                int i = 0;
+                foreach (Type iGrainType in iGrainTypes)
+                {
+                    tasks[i++] = GetWorkflowQueue(iGrainType).AddToQueue(
+                        new IndexWorkflowRecord(workflowID, thisGrain, updates).AsImmutable()
+                    );
+                }
+                return Task.WhenAll(tasks);
+            }
         }
 
         /// <summary>
@@ -578,6 +651,28 @@ namespace Orleans.Indexing
         public virtual Task RemoveFromActiveWorkflowIds(HashSet<Guid> removedWorkflowId)
         {
             throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Find the corresponding work-flow queue for a given grain interface
+        /// type that the current IndexableGrain implements
+        /// </summary>
+        /// <param name="iGrainType">the given grain interface type</param>
+        /// <returns>the work-flow queue corresponding to the iGrainType</returns>
+        internal IIndexWorkflowQueue GetWorkflowQueue(Type iGrainType)
+        {
+            if (WorkflowQueues == null)
+            {
+                WorkflowQueues = new Dictionary<Type, IIndexWorkflowQueue>();
+            }
+
+            IIndexWorkflowQueue workflowQ;
+            if (!WorkflowQueues.TryGetValue(iGrainType, out workflowQ))
+            {
+                workflowQ = IndexWorkflowQueueBase.GetIndexWorkflowQueueFromGrainHashCode(iGrainType, this.AsReference<IIndexableGrain>(GrainFactory, iGrainType).GetHashCode(), RuntimeAddress);
+                WorkflowQueues.Add(iGrainType, workflowQ);
+            }
+            return workflowQ;
         }
     }
 

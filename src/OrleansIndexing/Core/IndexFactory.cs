@@ -199,6 +199,27 @@ namespace Orleans.Indexing
             return new IndexUpdateGenerator(indexedProperty);
         }
 
+        internal static void RegisterIndexWorkflowQueues(Type iGrainType, Type grainImplType)
+        {
+            Silo silo = Silo.CurrentSilo;
+            for (int i = 0; i < IndexWorkflowQueueBase.NUM_AVAILABLE_INDEX_WORKFLOW_QUEUES; ++i)
+            {
+                silo.RegisterSystemTarget(new IndexWorkflowQueueSystemTarget(
+                    iGrainType,
+                    i,
+                    silo.SiloAddress,
+                    typeof(IIndexableGrainFaultTolerant).IsAssignableFrom(grainImplType)
+                ));
+
+                silo.RegisterSystemTarget(new IndexWorkflowQueueHandlerSystemTarget(
+                    iGrainType,
+                    i,
+                    silo.SiloAddress,
+                    typeof(IIndexableGrainFaultTolerant).IsAssignableFrom(grainImplType)
+                ));
+            }
+        }
+
         /// <summary>
         /// Registers the given index with the given name
         /// into the Orleans Indexing runtime.

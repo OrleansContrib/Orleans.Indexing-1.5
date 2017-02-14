@@ -131,13 +131,16 @@ namespace Orleans.Runtime
 
         //private static Type iIndexableGrainType;
         private static Type genericIIndexableGrainType;
+        private static Type genericFaultTolerantIndexableGrainType;
         private static Type indexAttributeType;
         private static PropertyInfo indexTypeProperty;
         private static Type indexFactoryType;
         private static Func<IGrainFactory, Type, string, bool, bool, int, PropertyInfo, Tuple<object, object, object>> createIndexMethod;
+        private static Action<Type, Type> registerIndexWorkflowQueuesMethod;
         private static PropertyInfo isEagerProperty;
         private static PropertyInfo isUniqueProperty;
         private static PropertyInfo maxEntriesPerBucketProperty;
+        private static Type initializedIndexType;
 
         /// <summary>
         /// This method crawls the assemblies and looks for the index
@@ -157,17 +160,22 @@ namespace Orleans.Runtime
             {
                 //iIndexableGrainType = Type.GetType("Orleans.Indexing.IIndexableGrain, OrleansIndexing");
                 genericIIndexableGrainType = Type.GetType("Orleans.Indexing.IIndexableGrain`1" + AssemblySeparator + OrleansIndexingAssembly);
+                genericFaultTolerantIndexableGrainType = Type.GetType("Orleans.Indexing.IndexableGrain`1" + AssemblySeparator + OrleansIndexingAssembly);
                 indexAttributeType = Type.GetType("Orleans.Indexing.IndexAttribute" + AssemblySeparator + OrleansIndexingAssembly);
                 indexTypeProperty = indexAttributeType.GetProperty("IndexType");
                 indexFactoryType = Type.GetType("Orleans.Indexing.IndexFactory" + AssemblySeparator + OrleansIndexingAssembly);
                 createIndexMethod = (Func<IGrainFactory, Type, string, bool, bool, int, PropertyInfo, Tuple<object, object, object>>)Delegate.CreateDelegate(
                                         typeof(Func<IGrainFactory, Type, string, bool, bool, int, PropertyInfo, Tuple<object, object, object>>),
                                         indexFactoryType.GetMethod("CreateIndex", BindingFlags.Static | BindingFlags.NonPublic));
+                registerIndexWorkflowQueuesMethod = (Action<Type, Type>)Delegate.CreateDelegate(
+                                        typeof(Action<Type, Type>),
+                                        indexFactoryType.GetMethod("RegisterIndexWorkflowQueues", BindingFlags.Static | BindingFlags.NonPublic));
                 isEagerProperty = indexAttributeType.GetProperty("IsEager");
                 isUniqueProperty = indexAttributeType.GetProperty("IsUnique");
                 maxEntriesPerBucketProperty = indexAttributeType.GetProperty("MaxEntriesPerBucket");
+                initializedIndexType = Type.GetType("Orleans.Indexing.InitializedIndex" + AssemblySeparator + OrleansIndexingAssembly);
             }
-            catch (Exception e)
+            catch
             {
                 //indexing project is not added as a dependency.
                 return result;
@@ -227,6 +235,11 @@ namespace Orleans.Runtime
             //interface extending IIndexable<TProperties>
             if (iIndexableGrain != userDefinedIGrain && iIndexableGrain.IsAssignableFrom(userDefinedIGrain) && !result.ContainsKey(userDefinedIGrain))
             {
+                //check either all indexes are defined as lazy
+                //or all indexes are defined as lazy and none of them
+                //are I-Index, because I-Indexes cannot be lazy
+                CheckAllIndexesAreEitherLazyOrEager(propertiesArg, userDefinedIGrain, userDefinedGrainImpl);
+
                 IDictionary<string, Tuple<object, object, object>> indexesOnGrain = new Dictionary<string, Tuple<object, object, object>>();
                 //all the properties in TProperties are scanned for Index
                 //annotation and the index is created using the information
@@ -252,6 +265,45 @@ namespace Orleans.Runtime
                     }
                 }
                 result.Add(userDefinedIGrain, indexesOnGrain);
+                if (!isEagerlyUpdated)
+                {
+                    registerIndexWorkflowQueuesMethod(userDefinedIGrain, userDefinedGrainImpl);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CheckAllIndexesAreEitherLazyOrEager(Type propertiesArg, Type userDefinedIGrain, Type userDefinedGrainImpl)
+        {
+            bool isFaultTolerant = TypeUtils.IsSubclassOfRawGenericType(genericFaultTolerantIndexableGrainType, userDefinedGrainImpl);
+            foreach (PropertyInfo p in propertiesArg.GetProperties())
+            {
+                var indexAttrs = p.GetCustomAttributes(indexAttributeType, false);
+                bool isFirstIndexEager = false;
+                if (indexAttrs.Count() > 0)
+                {
+                    isFirstIndexEager = (bool)isEagerProperty.GetValue(indexAttrs[0]);
+                }
+                foreach (var indexAttr in indexAttrs)
+                {
+                    bool isEager = (bool)isEagerProperty.GetValue(indexAttr);
+                    Type indexType = (Type)indexTypeProperty.GetValue(indexAttr);
+                    bool isIIndex = initializedIndexType.IsAssignableFrom(indexType);
+
+                    //I-Index cannot be configured as being lazy
+                    if (isIIndex && isEager)
+                    {
+                        throw new InvalidOperationException(string.Format("An I-Index cannot be configured to be updated eagerly. The only option for updating an I-Index is lazy updating. I-Index of type {0} is defined to be updated eagerly on property {1} of class {2} on {3} grain interface.", TypeUtils.GetFullName(indexType), p.Name, TypeUtils.GetFullName(propertiesArg), TypeUtils.GetFullName(userDefinedIGrain)));
+                    }
+                    else if(isFaultTolerant && isEager)
+                    {
+                        throw new InvalidOperationException(string.Format("A fault-tolerant grain implementation cannot be configured to eagerly update its indexes. The only option for updating the indexes of a fault-tolerant indexable grain is lazy updating. The index of type {0} is defined to be updated eagerly on property {1} of class {2} on {3} grain implementation class.", TypeUtils.GetFullName(indexType), p.Name, TypeUtils.GetFullName(propertiesArg), TypeUtils.GetFullName(userDefinedGrainImpl)));
+                    }
+                    else if (isEager != isFirstIndexEager)
+                    {
+                        throw new InvalidOperationException(string.Format("Some indexes on property class {0} of {1} grain interface are defined to be updated eagerly while others are configured as lazy updating. You should fix this by configuring all indexes to be updated lazily or eagerly. If you have at least one I-Index among your indexes, then all other indexes should be configured as lazy, too.", TypeUtils.GetFullName(propertiesArg), TypeUtils.GetFullName(userDefinedIGrain)));
+                    }
+                }
             }
         }
 
