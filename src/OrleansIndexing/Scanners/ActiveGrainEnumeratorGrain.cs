@@ -1,9 +1,7 @@
 using System.Threading.Tasks;
-using Orleans;
 using System.Collections.Generic;
 using System;
 using Orleans.Runtime;
-using Orleans.Runtime.MembershipService;
 using System.Linq;
 
 namespace Orleans.Indexing

@@ -1,11 +1,4 @@
-﻿using Orleans;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Orleans.Indexing
+﻿namespace Orleans.Indexing
 {
     /// <summary>
     /// This interface specifies a method that each index should define 

@@ -13,7 +13,7 @@ namespace Orleans.Runtime
     /// </summary>
     public abstract class SystemTarget : ISystemTarget, ISystemTargetBase, IInvokable
     {
-        internal readonly GrainId grainId;
+        private readonly GrainId grainId;
         private readonly SchedulingContext schedulingContext;
         private IGrainMethodInvoker lastInvoker;
         private Message running;

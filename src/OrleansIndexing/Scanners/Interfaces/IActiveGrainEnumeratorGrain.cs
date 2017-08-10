@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
-using Orleans;
 using System.Collections.Generic;
 using System;
-using Orleans.Runtime;
 
 namespace Orleans.Indexing
 {

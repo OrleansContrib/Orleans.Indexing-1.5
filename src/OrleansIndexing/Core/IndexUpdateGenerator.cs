@@ -1,29 +1,8 @@
-﻿using Orleans;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Orleans.Indexing
 {
-    /// <summary>
-    /// Default implementation of IIndexUpdateGenerator<K,V>
-    /// that generically implements CreateMemberUpdate
-    /// </summary>
-    /// <typeparam name="K">the key type of the index</typeparam>
-    /// <typeparam name="V">the value type of the index</typeparam>
-    //[Serializable]
-    //public abstract class IndexUpdateGenerator<K, TProperties> : IIndexUpdateGenerator<K, TProperties>
-    //{
-    //    public override IMemberUpdate CreateMemberUpdate(TProperties gProps, K befImg)
-    //    {
-    //        K aftImg = ExtractIndexImage(gProps);
-    //        return new MemberUpdate(befImg, aftImg);
-    //    }
-    //}
-
     /// <summary>
     /// 
     /// </summary>

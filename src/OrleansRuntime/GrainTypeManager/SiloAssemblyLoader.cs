@@ -140,7 +140,7 @@ namespace Orleans.Runtime
         private static PropertyInfo isEagerProperty;
         private static PropertyInfo isUniqueProperty;
         private static PropertyInfo maxEntriesPerBucketProperty;
-        private static Type initializedIndexType;
+        private static Type totalIndexType;
 
         /// <summary>
         /// This method crawls the assemblies and looks for the index
@@ -152,7 +152,18 @@ namespace Orleans.Runtime
         /// </summary>
         /// <param name="strict">determines the lookup strategy for
         /// looking into the assemblies</param>
-        /// <returns></returns>
+        /// <returns>A dictionary of grain interface types to their
+        /// corresponding index information. The index information is
+        /// a dictionary from index IDs defined on a grain interface to
+        /// a triple. The triple consists of: 1) the index object (that
+        /// implements IndexInterface, 2) the IndexMetaData object for
+        /// this index, and 3) the IndexUpdateGenerator instance for this index.
+        /// This triple is untyped, because IndexInterface, IndexMetaData
+        /// and IndexUpdateGenerator types are not visible in this project.
+        /// 
+        /// This method returns an empty dictionary if the OrleansIndexing 
+        /// project is not available.
+        /// </returns>
         public IDictionary<Type, IDictionary<string, Tuple<object, object, object>>> GetGrainClassIndexes(bool strict)
         {
             var result = new Dictionary<Type, IDictionary<string, Tuple<object, object, object>>>();
@@ -173,7 +184,7 @@ namespace Orleans.Runtime
                 isEagerProperty = indexAttributeType.GetProperty("IsEager");
                 isUniqueProperty = indexAttributeType.GetProperty("IsUnique");
                 maxEntriesPerBucketProperty = indexAttributeType.GetProperty("MaxEntriesPerBucket");
-                initializedIndexType = Type.GetType("Orleans.Indexing.InitializedIndex" + AssemblySeparator + OrleansIndexingAssembly);
+                totalIndexType = Type.GetType("Orleans.Indexing.TotalIndex" + AssemblySeparator + OrleansIndexingAssembly);
             }
             catch
             {
@@ -237,7 +248,7 @@ namespace Orleans.Runtime
             {
                 //check either all indexes are defined as lazy
                 //or all indexes are defined as lazy and none of them
-                //are I-Index, because I-Indexes cannot be lazy
+                //are Total Index, because Total Indexes cannot be lazy
                 CheckAllIndexesAreEitherLazyOrEager(propertiesArg, userDefinedIGrain, userDefinedGrainImpl);
 
                 IDictionary<string, Tuple<object, object, object>> indexesOnGrain = new Dictionary<string, Tuple<object, object, object>>();
@@ -288,12 +299,12 @@ namespace Orleans.Runtime
                 {
                     bool isEager = (bool)isEagerProperty.GetValue(indexAttr);
                     Type indexType = (Type)indexTypeProperty.GetValue(indexAttr);
-                    bool isIIndex = initializedIndexType.IsAssignableFrom(indexType);
+                    bool isTotalIndex = totalIndexType.IsAssignableFrom(indexType);
 
-                    //I-Index cannot be configured as being lazy
-                    if (isIIndex && isEager)
+                    //Total Index cannot be configured as being lazy
+                    if (isTotalIndex && isEager)
                     {
-                        throw new InvalidOperationException(string.Format("An I-Index cannot be configured to be updated eagerly. The only option for updating an I-Index is lazy updating. I-Index of type {0} is defined to be updated eagerly on property {1} of class {2} on {3} grain interface.", TypeUtils.GetFullName(indexType), p.Name, TypeUtils.GetFullName(propertiesArg), TypeUtils.GetFullName(userDefinedIGrain)));
+                        throw new InvalidOperationException(string.Format("A Total Index cannot be configured to be updated eagerly. The only option for updating a Total Index is lazy updating. Total Index of type {0} is defined to be updated eagerly on property {1} of class {2} on {3} grain interface.", TypeUtils.GetFullName(indexType), p.Name, TypeUtils.GetFullName(propertiesArg), TypeUtils.GetFullName(userDefinedIGrain)));
                     }
                     else if(isFaultTolerant && isEager)
                     {
@@ -301,7 +312,7 @@ namespace Orleans.Runtime
                     }
                     else if (isEager != isFirstIndexEager)
                     {
-                        throw new InvalidOperationException(string.Format("Some indexes on property class {0} of {1} grain interface are defined to be updated eagerly while others are configured as lazy updating. You should fix this by configuring all indexes to be updated lazily or eagerly. If you have at least one I-Index among your indexes, then all other indexes should be configured as lazy, too.", TypeUtils.GetFullName(propertiesArg), TypeUtils.GetFullName(userDefinedIGrain)));
+                        throw new InvalidOperationException(string.Format("Some indexes on property class {0} of {1} grain interface are defined to be updated eagerly while others are configured as lazy updating. You should fix this by configuring all indexes to be updated lazily or eagerly. If you have at least one Total Index among your indexes, then all other indexes should be configured as lazy, too.", TypeUtils.GetFullName(propertiesArg), TypeUtils.GetFullName(userDefinedIGrain)));
                     }
                 }
             }

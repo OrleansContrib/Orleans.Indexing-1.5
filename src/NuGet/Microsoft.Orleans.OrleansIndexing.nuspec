@@ -8,18 +8,24 @@
     <owners>Microsoft,Orleans</owners>
     <projectUrl>https://github.com/dotnet/Orleans</projectUrl>
     <licenseUrl>https://github.com/dotnet/Orleans#license</licenseUrl>
-    <iconUrl>https://raw.githubusercontent.com/jthelin/jthelin.github.io/master/images/Orleans-nuget.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/dotnet/orleans/gh-pages/assets/logo_128.png</iconUrl>
     <summary>
       Microsoft Orleans Indexing
     </summary>
     <description>
       Indexing capabilities for Orleans grains.
     </description>
-    <copyright>Copyright Microsoft 2015</copyright>
+    <copyright>Copyright Microsoft 2017</copyright>
     <tags>Orleans Cloud-Computing Actor-Model Actors Distributed-Systems C# .NET</tags>
     <dependencies>
       <dependency id="Microsoft.Orleans.Core" version="$version$" />
       <dependency id="Microsoft.Orleans.OrleansRuntime" version="$version$" />
+	  <dependency id="System.Reactive" version="3.0.0"  />
+	  <dependency id="System.Reactive.Core" version="3.0.0" />
+	  <dependency id="System.Reactive.Interfaces" version="3.0.0" />
+	  <dependency id="System.Reactive.Linq" version="3.0.0" />
+	  <dependency id="System.Reactive.PlatformServices" version="3.0.0" />
+	  <dependency id="System.Reactive.Windows.Threading" version="3.0.0" />
     </dependencies>
   </metadata>
   <files>

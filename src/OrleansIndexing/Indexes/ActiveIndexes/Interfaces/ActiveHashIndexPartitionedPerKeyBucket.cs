@@ -10,7 +10,7 @@ namespace Orleans.Indexing
     /// <typeparam name="K">type of hash-index key</typeparam>
     /// <typeparam name="V">type of grain that is being indexed</typeparam>
     [Unordered]
-    public interface AHashIndexPartitionedPerKeyBucket<K, V> : IGrainWithStringKey, HashIndexPartitionedPerKeyBucketInterface<K, V> where V : IIndexableGrain
+    public interface ActiveHashIndexPartitionedPerKeyBucket<K, V> : IGrainWithStringKey, HashIndexPartitionedPerKeyBucketInterface<K, V> where V : IIndexableGrain
     {
     }
 }

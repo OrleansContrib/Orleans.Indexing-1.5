@@ -230,9 +230,10 @@ namespace Orleans.Storage
             }
         }
 
-        /// <summary> Write state data function for this storage provider. </summary>
-        /// <see cref="IStorageProvider.WriteStateAsync"/>
-        public async Task InsertOrUpdateStateAsync(string grainType, GrainReference grainId, IGrainState grainState)
+        /// <summary> Write state data function for this storage provider without 
+        /// checking for ETag before update (if there already exists a prior state). </summary>
+        /// <see cref="IExtendedStorageProvider.WriteStateWithoutEtagCheckAsync"/>
+        public async Task WriteStateWithoutEtagCheckAsync(string grainType, GrainReference grainId, IGrainState grainState)
         {
             var blobName = GetBlobName(grainType, grainId);
             try

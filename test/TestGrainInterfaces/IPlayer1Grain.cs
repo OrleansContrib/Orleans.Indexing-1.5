@@ -10,7 +10,7 @@ namespace UnitTests.GrainInterfaces
     {
         public int Score { get; set; }
 
-        [IIndex]
+        [TotalIndex]
         public string Location { get; set; }
     }
 

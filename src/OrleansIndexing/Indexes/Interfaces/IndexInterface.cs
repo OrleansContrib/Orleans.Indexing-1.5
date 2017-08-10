@@ -1,5 +1,4 @@
-﻿using Orleans;
-using Orleans.Concurrency;
+﻿using Orleans.Concurrency;
 using Orleans.Runtime;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -39,7 +38,7 @@ namespace Orleans.Indexing
         Task<bool> DirectApplyIndexUpdateBatch(Immutable<IDictionary<IIndexableGrain, IList<IMemberUpdate>>> iUpdates, bool isUnique, IndexMetaData idxMetaData, SiloAddress siloAddress = null);
 
         /// <summary>
-        /// Disposes of the index and removes all the data stored
+        /// Disposes the index and removes all the data stored
         /// for the index. This method is called before removing
         /// the index from index registry
         /// </summary>
@@ -64,7 +63,7 @@ namespace Orleans.Indexing
 
         /// <summary>
         /// This method is used for extracting the whole result of
-        /// a lookup from an AHashIndexPartitionedPerSiloBucket.
+        /// a lookup from an ActiveHashIndexPartitionedPerSiloBucket.
         /// 
         /// TODO: This should not be necessary if we could call streams
         /// from within a SystemTarget, and the stream were efficient enough
@@ -94,7 +93,7 @@ namespace Orleans.Indexing
 
         /// <summary>
         /// This method is used for extracting the whole result of
-        /// a lookup from an AHashIndexPartitionedPerSiloBucket.
+        /// a lookup from an ActiveHashIndexPartitionedPerSiloBucket.
         /// 
         /// TODO: This should not be necessary if we could call streams
         /// from within a SystemTarget, and the stream were efficient enough

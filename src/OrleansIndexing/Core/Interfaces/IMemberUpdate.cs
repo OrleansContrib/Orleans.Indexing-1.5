@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Orleans.Indexing
+﻿namespace Orleans.Indexing
 {
     /// <summary>
     /// IMemberUpdate encapsulates the information related to a grain update 

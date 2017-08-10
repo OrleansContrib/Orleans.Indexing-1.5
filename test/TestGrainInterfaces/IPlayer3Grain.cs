@@ -10,7 +10,7 @@ namespace UnitTests.GrainInterfaces
     {
         public int Score { get; set; }
 
-        [IIndex(IndexType.HashIndexPartitionedByKeyHash)]
+        [TotalIndex(TotalIndexType.HashIndexPartitionedByKeyHash)]
         public string Location { get; set; }
     }
 

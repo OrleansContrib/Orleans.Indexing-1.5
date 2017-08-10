@@ -1,60 +1,26 @@
-﻿using Orleans.Concurrency;
-using Orleans.Runtime;
+﻿using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Orleans.Indexing
 {
     public static class IndexRegistry
     {
-
-        //internal static Task<bool> RegisterIndex(Type iGrainType, string indexName, IndexInterface index, IndexMetaData indexMetaData)
-        //{
-        //    if (GetIndexes(iGrainType).ContainsKey(indexName))
-        //    {
-        //        throw new Exception(string.Format("Index with name ({0}) and type ({1}) already exists.", indexName, index.GetType()));
-        //    }
-        //    GetIndexes(iGrainType).Add(indexName, Tuple.Create((object)index, (object)indexMetaData, (object)indexMetaData.getIndexUpdateGeneratorInstance()));
-        //    return Task.FromResult(true);
-        //}
-
-        //internal static Task<bool> RegisterIndex<T>(string indexName, IndexInterface index, IndexMetaData indexMetaData) where T : IIndexableGrain
-        //{
-        //    var iGrainType = typeof(T);
-        //    return RegisterIndex(iGrainType, indexName, index, indexMetaData);
-        //}
-
-        //internal static async Task<bool> DropIndex<T>(string indexName) where T : IIndexableGrain
-        //{
-        //    var iGrainType = typeof(T);
-        //    Tuple<object, object, object> index;
-        //    GetIndexes(iGrainType).TryGetValue(indexName, out index);
-        //    if (index != null)
-        //    {
-        //        await ((IndexInterface)index.Item1).Dispose();
-        //        return GetIndexes(iGrainType).Remove(indexName);
-        //    }
-        //    else
-        //    {
-        //        throw new Exception(string.Format("Index with name ({0}) does not exist for type ({1}).", indexName, TypeUtils.GetFullName(typeof(T))));
-        //    }
-        //}
-
-        //internal static async Task DropAllIndexes<T>() where T : IIndexableGrain
-        //{
-        //    var iGrainType = typeof(T);
-        //    IList<Task> disposeTasks = new List<Task>();
-        //    foreach (KeyValuePair<string, Tuple<object, object, object>> index in GetIndexes(iGrainType))
-        //    {
-        //        disposeTasks.Add(((IndexInterface)index.Value.Item1).Dispose());
-        //    }
-        //    await Task.WhenAll(disposeTasks);
-        //    GetIndexes(iGrainType).Clear();
-        //}
-
+        /// <summary>
+        /// Provides the index information for a given grain interface type.
+        /// </summary>
+        /// <param name="iGrainType">The target grain interface type</param>
+        /// <returns>the index information for the given grain type T.
+        /// The index information is a dictionary from indexIDs defined
+        /// on a grain interface to a triple. The triple consists of:
+        /// 1) the index object (that implements IndexInterface,
+        /// 2) the IndexMetaData object for this index, and
+        /// 3) the IndexUpdateGenerator instance for this index.
+        /// This triple is untyped, because IndexInterface, IndexMetaData
+        /// and IndexUpdateGenerator types are not visible in this project.
+        /// 
+        /// This method returns an empty dictionary if the OrleansIndexing 
+        /// project is not available.</returns>
         internal static IDictionary<string, Tuple<object, object, object>> GetIndexes(Type iGrainType)
         {
             IDictionary<string, Tuple<object, object, object>> indexes;
@@ -65,6 +31,21 @@ namespace Orleans.Indexing
             return indexes;
         }
 
+        /// <summary>
+        /// Provides the index information for a given grain interface type.
+        /// </summary>
+        /// <typeparam name="T">The target grain interface type</typeparam>
+        /// <returns>the index information for the given grain type T.
+        /// The index information is a dictionary from indexIDs defined
+        /// on a grain interface to a triple. The triple consists of:
+        /// 1) the index object (that implements IndexInterface,
+        /// 2) the IndexMetaData object for this index, and
+        /// 3) the IndexUpdateGenerator instance for this index.
+        /// This triple is untyped, because IndexInterface, IndexMetaData
+        /// and IndexUpdateGenerator types are not visible in this project.
+        /// 
+        /// This method returns an empty dictionary if the OrleansIndexing 
+        /// project is not available.</returns>
         internal static IDictionary<string, Tuple<object, object, object>> GetIndexes<T>() where T : IIndexableGrain
         {
             return GetIndexes(typeof(T));

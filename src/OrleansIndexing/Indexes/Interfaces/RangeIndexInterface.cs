@@ -1,9 +1,4 @@
-﻿using Orleans;
-using Orleans.Concurrency;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Orleans.Concurrency;
 using System.Threading.Tasks;
 
 namespace Orleans.Indexing
@@ -48,15 +43,5 @@ namespace Orleans.Indexing
         [ReadOnly]
         [AlwaysInterleave]
         Task<IOrleansQueryResultStream<V>> LookupToRange(K to);
-
-        /// <summary>
-        /// Each range index requires a comparison function and user
-        /// can provide this comparison function via a call to this method.
-        /// 
-        /// This method should be used internally by the index grain and
-        /// should not be invoked from other grains.
-        /// </summary>
-        /// <param name="compLambda">the comparison function</param>
-        //void SetComparisonLambda(Func<K, long> compLambda);
     }
 }

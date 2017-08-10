@@ -1,8 +1,6 @@
-﻿using Orleans;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Orleans.Concurrency;
 using Orleans.Runtime;
@@ -26,7 +24,7 @@ namespace Orleans.Indexing
 
         private string _indexName;
         private string _indexedField;
-        //private bool _isUnique;
+        //private bool _isUnique; //TODO: missing support for the uniqueness feature
 
         private static readonly Logger logger = LogManager.GetLogger(string.Format("HashIndexPartitionedPerKey<{0},{1}>", typeof(K).Name, typeof(V).Name), LoggerType.Grain);
 
@@ -34,18 +32,18 @@ namespace Orleans.Indexing
         {
             _indexName = IndexUtils.GetIndexNameFromIndexGrain(this);
             _indexedField = _indexName.Substring(2);
-            //_isUnique = isUniqueIndex;
+            //_isUnique = isUniqueIndex; //TODO: missing support for the uniqueness feature
             return base.OnActivateAsync();
         }
 
-        public async Task<bool> DirectApplyIndexUpdateBatch(Immutable<IDictionary<IIndexableGrain, IList<IMemberUpdate>>> iUpdates, bool isUnique, IndexMetaData idxMetaData, SiloAddress siloAddress = null)
+        public Task<bool> DirectApplyIndexUpdateBatch(Immutable<IDictionary<IIndexableGrain, IList<IMemberUpdate>>> iUpdates, bool isUnique, IndexMetaData idxMetaData, SiloAddress siloAddress = null)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
-        public async Task<bool> DirectApplyIndexUpdate(IIndexableGrain g, Immutable<IMemberUpdate> iUpdate, bool isUniqueIndex, IndexMetaData idxMetaData, SiloAddress siloAddress)
+        public Task<bool> DirectApplyIndexUpdate(IIndexableGrain g, Immutable<IMemberUpdate> iUpdate, bool isUniqueIndex, IndexMetaData idxMetaData, SiloAddress siloAddress)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task Lookup(IOrleansQueryResultStream<V> result, K key)
@@ -78,8 +76,6 @@ namespace Orleans.Indexing
 
         public Task Dispose()
         {
-            //right now, we cannot do anything.
-            //we need to know the list of buckets
             return TaskDone.Done;
         }
 

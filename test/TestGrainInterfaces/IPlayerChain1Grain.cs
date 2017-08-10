@@ -11,7 +11,7 @@ namespace UnitTests.GrainInterfaces
         [Index]
         public int Score { get; set; }
         
-        [AIndex(IndexType.HashIndexSingleBucket,true,5)]
+        [ActiveIndex(ActiveIndexType.HashIndexSingleBucket,true,5)]
         public string Location { get; set; }
     }
 

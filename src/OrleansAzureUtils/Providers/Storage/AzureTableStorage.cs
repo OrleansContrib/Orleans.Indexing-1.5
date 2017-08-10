@@ -195,9 +195,10 @@ namespace Orleans.Storage
             }
         }
 
-        /// <summary> Write state data function for this storage provider. </summary>
-        /// <see cref="IStorageProvider.WriteStateAsync"/>
-        public async Task InsertOrUpdateStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        /// <summary> Write state data function for this storage provider without 
+        /// checking for ETag before update (if there already exists a prior state). </summary>
+        /// <see cref="IExtendedStorageProvider.WriteStateWithoutEtagCheckAsync"/>
+        public async Task WriteStateWithoutEtagCheckAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             if (tableDataManager == null) throw new ArgumentException("GrainState-Table property not initialized");
 
@@ -210,7 +211,7 @@ namespace Orleans.Storage
             var record = new GrainStateRecord { Entity = entity, ETag = grainState.ETag };
             try
             {
-                await tableDataManager.InsertOrUpdate(record);
+                await tableDataManager.WriteWithoutEtagCheck(record);
                 grainState.ETag = record.ETag;
             }
             catch (Exception exc)
@@ -540,7 +541,7 @@ namespace Orleans.Storage
                 record.ETag = eTag;
             }
 
-            public Task InsertOrUpdate(GrainStateRecord record)
+            public Task WriteWithoutEtagCheck(GrainStateRecord record)
             {
                 var entity = record.Entity;
                 if (logger.IsVerbose3) logger.Verbose3((int)AzureProviderErrorCode.AzureTableProvider_Storage_Writing, "Writing: PartitionKey={0} RowKey={1} to Table={2} with ETag={3}", entity.PartitionKey, entity.RowKey, TableName, record.ETag);

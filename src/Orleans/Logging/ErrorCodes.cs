@@ -1111,11 +1111,17 @@ namespace Orleans
         // Microsoft.Orleans.ServiceFabric.Utilities.ErrorCode.
         ServiceFabricBase = Runtime + 4400,
 
-        Indexing                                    = Runtime + 4500,
-        IndexingIndexBuilderFailed                  = Indexing + 1,
-        IndexingIndexBuilderFailedToBuildIndex      = Indexing + 2,
-        IndexingIndexBuilderFailedToBuildIndexAgain = Indexing + 3,
-        IndexingIndexIsNotReadyYet                  = Indexing + 4,
+        Indexing                                       = Runtime + 4500,
+        IndexingIndexIsNotReadyYet_GrainBucket1        = Indexing + 1,
+        IndexingIndexIsNotReadyYet_GrainBucket2        = Indexing + 2,
+        IndexingIndexIsNotReadyYet_GrainBucket3        = Indexing + 3,
+        IndexingIndexIsNotReadyYet_GrainBucket4        = Indexing + 4,
+        IndexingIndexIsNotReadyYet_GrainBucket5        = Indexing + 5,
+        IndexingIndexIsNotReadyYet_SystemTargetBucket1 = Indexing + 6,
+        IndexingIndexIsNotReadyYet_SystemTargetBucket2 = Indexing + 7,
+        IndexingIndexIsNotReadyYet_SystemTargetBucket3 = Indexing + 8,
+        IndexingIndexIsNotReadyYet_SystemTargetBucket4 = Indexing + 9,
+        IndexingIndexIsNotReadyYet_SystemTargetBucket5 = Indexing + 10,
     }
 }
 // ReSharper restore InconsistentNaming

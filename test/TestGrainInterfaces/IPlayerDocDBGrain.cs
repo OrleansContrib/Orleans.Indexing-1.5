@@ -11,7 +11,7 @@ namespace UnitTests.GrainInterfaces
         [Index]
         public int Score { get; set; }
         
-        [DSMIndex]
+        [StorageManagedIndex]
         public string Location { get; set; }
     }
 

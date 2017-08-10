@@ -8,10 +8,10 @@ namespace UnitTests.GrainInterfaces
     [Serializable]
     public class Player5Properties : PlayerProperties
     {
-        [Index(typeof(AHashIndexSingleBucket<string, IPlayer5Grain>)/*, IsEager: false*/, IsUnique: true)]
+        [Index(typeof(ActiveHashIndexSingleBucket<string, IPlayer5Grain>)/*, IsEager: false*/, IsUnique: true)]
         public int Score { get; set; }
 
-        [Index(typeof(AHashIndexPartitionedPerKey<string, IPlayer5Grain>)/*, IsEager: false*/, IsUnique: true)]
+        [Index(typeof(ActiveHashIndexPartitionedPerKey<string, IPlayer5Grain>)/*, IsEager: false*/, IsUnique: true)]
         public string Location { get; set; }
     }
 

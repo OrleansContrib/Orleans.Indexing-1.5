@@ -1,6 +1,5 @@
 ﻿using Orleans.Runtime;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Orleans.Indexing
@@ -13,8 +12,6 @@ namespace Orleans.Indexing
     [Serializable]
     public class HashIndexBucketState<K, V> where V : IIndexableGrain
     {
-        //public string Name { set; get; }
-
         /// <summary>
         /// The actual storage of the indexed values
         /// </summary>

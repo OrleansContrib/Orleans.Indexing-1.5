@@ -1,12 +1,8 @@
 ﻿using Orleans.Concurrency;
-using Orleans.Core;
 using Orleans.Runtime;
-using Orleans.Storage;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Orleans.Indexing
@@ -20,9 +16,9 @@ namespace Orleans.Indexing
         private Type _iGrainType;
 
         private bool _isDefinedAsFaultTolerantGrain;
-        private bool _hasAnyIIndex;
-        private bool HasAnyIIndex { get { if (__indexes == null) { InitIndexes(); } return _hasAnyIIndex; } }
-        private bool IsFaultTolerant { get { return _isDefinedAsFaultTolerantGrain && HasAnyIIndex; } }
+        private bool _hasAnyTotalIndex;
+        private bool HasAnyTotalIndex { get { if (__indexes == null) { InitIndexes(); } return _hasAnyTotalIndex; } }
+        private bool IsFaultTolerant { get { return _isDefinedAsFaultTolerantGrain && HasAnyTotalIndex; } }
 
         private IDictionary<string, Tuple<object, object, object>> __indexes;
 
@@ -36,7 +32,7 @@ namespace Orleans.Indexing
             _iGrainType = iGrainType;
             _queueSeqNum = queueSeqNum;
             _isDefinedAsFaultTolerantGrain = isDefinedAsFaultTolerantGrain;
-            _hasAnyIIndex = false;
+            _hasAnyTotalIndex = false;
             __indexes = null;
             __workflowQueue = null;
             _silo = silo;
@@ -200,9 +196,9 @@ namespace Orleans.Indexing
             __indexes = IndexHandler.GetIndexes(_iGrainType);
             foreach(var idxInfo in __indexes.Values)
             {
-                if(idxInfo.Item1 is InitializedIndex)
+                if(idxInfo.Item1 is TotalIndex)
                 {
-                    _hasAnyIIndex = true;
+                    _hasAnyTotalIndex = true;
                     return __indexes;
                 }
             }

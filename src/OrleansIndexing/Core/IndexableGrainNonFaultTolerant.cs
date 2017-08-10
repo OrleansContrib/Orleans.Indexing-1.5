@@ -1,12 +1,10 @@
-﻿using Orleans;
-using Orleans.Concurrency;
+﻿using Orleans.Concurrency;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Orleans.Runtime;
 using System.Reflection;
 using System.Linq;
-using Orleans.Storage;
 using System.Runtime.CompilerServices;
 
 namespace Orleans.Indexing
@@ -501,7 +499,7 @@ namespace Orleans.Indexing
                 foreach (KeyValuePair<string, Tuple<object, object, object>> kvp in iUpdateGens)
                 {
                     var idxInfo = kvp.Value;
-                    if (!onlyUpdateActiveIndexes || !(idxInfo.Item1 is InitializedIndex))
+                    if (!onlyUpdateActiveIndexes || !(idxInfo.Item1 is TotalIndex))
                     {
                         IMemberUpdate mu = isOnActivate ? ((IIndexUpdateGenerator)idxInfo.Item3).CreateMemberUpdate(befImgs[kvp.Key])
                                                         : ((IIndexUpdateGenerator)idxInfo.Item3).CreateMemberUpdate(indexableProperties, befImgs[kvp.Key]);

@@ -23,7 +23,6 @@
       <dependency id="Microsoft.Orleans.OrleansProviders" version="$version$" />
 
       <dependency id="WindowsAzure.Storage" version="7.0.0" />
-      <dependency id="Microsoft.Azure.DocumentDB" version="1.10.0" />
     </dependencies>
   </metadata>
   <files>

@@ -1,13 +1,8 @@
 ﻿using Orleans.Concurrency;
-using Orleans.Core;
 using Orleans.Providers;
 using Orleans.Runtime;
-using Orleans.Storage;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Orleans.Indexing
@@ -41,7 +36,7 @@ namespace Orleans.Indexing
         internal IndexWorkflowQueueSystemTarget(Type grainInterfaceType, int queueSequenceNumber, SiloAddress silo, bool isDefinedAsFaultTolerantGrain) : base(IndexWorkflowQueueBase.CreateIndexWorkflowQueueGrainId(grainInterfaceType, queueSequenceNumber), silo)
         {
             GrainReference thisRef = this.AsWeaklyTypedReference();
-            _base = new IndexWorkflowQueueBase(grainInterfaceType, queueSequenceNumber, silo, isDefinedAsFaultTolerantGrain, grainId, thisRef);
+            _base = new IndexWorkflowQueueBase(grainInterfaceType, queueSequenceNumber, silo, isDefinedAsFaultTolerantGrain, ((ISystemTargetBase)this).GrainId, thisRef);
         }
 
         public Task AddAllToQueue(Immutable<List<IndexWorkflowRecord>> workflowRecords)

@@ -22,7 +22,7 @@ namespace UnitTests.IndexingTests
         }
 
         /// <summary>
-        /// Tests basic functionality of AHashIndexPartitionedPerSiloImpl with 2 Silos
+        /// Tests basic functionality of ActiveHashIndexPartitionedPerSiloImpl with 2 Silos
         /// </summary>
         [Fact, TestCategory("BVT"), TestCategory("Indexing")]
         public async Task Test_Indexing_IndexLookup3()

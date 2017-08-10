@@ -1,12 +1,10 @@
-﻿using Orleans;
-using Orleans.Concurrency;
+﻿using Orleans.Concurrency;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Orleans.Runtime;
 using System.Reflection;
 using System.Linq;
-using Orleans.Storage;
 
 namespace Orleans.Indexing
 {
@@ -48,14 +46,14 @@ namespace Orleans.Indexing
             set { base.State.workflowQueues = value; }
         }
 
-        //0: uninitialized, 1: has some I-Indexes, 2: does not have any I-Index
-        private sbyte __hasAnyIIndex;
-        private bool HasAnyIIndex { get { return __hasAnyIIndex == 0 ? InitHasAnyIIndex() : __hasAnyIIndex > 0; } }
+        //0: uninitialized, 1: has some Total Indexes, 2: does not have any Total Index
+        private sbyte __hasAnyTotalIndex;
+        private bool HasAnyTotalIndex { get { return __hasAnyTotalIndex == 0 ? InitHasAnyTotalIndex() : __hasAnyTotalIndex > 0; } }
 
         public override Task OnActivateAsync()
         {
             //set it as un-initialized
-            __hasAnyIIndex = 0;
+            __hasAnyTotalIndex = 0;
 
             //if the list of active work-flows is null or empty
             //we can assume that we did not contact any work-flow
@@ -93,7 +91,7 @@ namespace Orleans.Indexing
                                                        int numberOfUniqueIndexesUpdated,
                                                        bool writeStateIfConstraintsAreNotViolated)
         {
-            if (HasAnyIIndex)
+            if (HasAnyTotalIndex)
             {
                 //if there is any update to the indexes
                 //we go ahead and updates the indexes
@@ -371,7 +369,7 @@ namespace Orleans.Indexing
             return _props;
         }
 
-        private bool InitHasAnyIIndex()
+        private bool InitHasAnyTotalIndex()
         {
             IList<Type> iGrainTypes = GetIIndexableGrainTypes();
             foreach (var iGrainType in iGrainTypes)
@@ -379,14 +377,14 @@ namespace Orleans.Indexing
                 var indexes = IndexHandler.GetIndexes(iGrainType);
                 foreach (var idxInfo in indexes.Values)
                 {
-                    if (idxInfo.Item1 is InitializedIndex)
+                    if (idxInfo.Item1 is TotalIndex)
                     {
-                        __hasAnyIIndex = 1;
+                        __hasAnyTotalIndex = 1;
                         return true;
                     }
                 }
             }
-            __hasAnyIIndex = -1;
+            __hasAnyTotalIndex = -1;
             return false;
         }
     }

@@ -291,14 +291,25 @@ namespace Orleans.Messaging
         }
 
         /// <summary>
-        /// 
+        /// This method returns a dictionary of grain interface types to their
+        /// corresponding index information.
         /// </summary>
-        /// <param name="grainFactory"></param>
-        /// <returns></returns>
+        /// <param name="grainFactory">the current instance of IInternalGrainFactory</param>
+        /// <returns>A dictionary of grain interface types to their
+        /// corresponding index information. The index information is
+        /// a dictionary from index IDs defined on a grain interface to
+        /// a triple. The triple consists of: 1) the index object (that
+        /// implements IndexInterface, 2) the IndexMetaData object for
+        /// this index, and 3) the IndexUpdateGenerator instance for this index.
+        /// This triple is untyped, because IndexInterface, IndexMetaData
+        /// and IndexUpdateGenerator types are not visible in this project.
+        /// 
+        /// This method returns an empty dictionary if the OrleansIndexing 
+        /// project is not available.</returns>
         public Task<IDictionary<Type, IDictionary<string, Tuple<object, object, object>>>> GetIndexes(IInternalGrainFactory grainFactory)
         {
             var silo = GetLiveGatewaySiloAddress();
-            return GetTypeManager(silo, grainFactory).GetIndexes(silo);
+            return GetTypeManager(silo, grainFactory).GetIndexes();
         }
 
         public Task<Streams.ImplicitStreamSubscriberTable> GetImplicitStreamSubscriberTable(IInternalGrainFactory grainFactory)

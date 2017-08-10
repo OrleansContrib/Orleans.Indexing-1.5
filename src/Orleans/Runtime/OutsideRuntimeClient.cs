@@ -52,8 +52,6 @@ namespace Orleans
         private static readonly TimeSpan resetTimeout = TimeSpan.FromMinutes(1);
 
         private const string BARS = "----------";
-
-        public IDictionary<Type, IDictionary<string, Tuple<object, object, object>>> Indexes { get; private set; }
         
         public IInternalGrainFactory InternalGrainFactory { get; }
 
@@ -97,6 +95,20 @@ namespace Orleans
         {
             get { return clientProviderRuntime; }
         }
+
+        /// <summary>
+        /// A dictionary of grain interface types to their
+        /// corresponding index information. The index information is
+        /// a dictionary from index IDs defined on a grain interface to
+        /// a triple. The triple consists of: 1) the index object (that
+        /// implements IndexInterface, 2) the IndexMetaData object for
+        /// this index, and 3) the IndexUpdateGenerator instance for this index.
+        /// This triple is untyped, because IndexInterface, IndexMetaData
+        /// and IndexUpdateGenerator types are not visible in this project.
+        /// 
+        /// If the OrleansIndexing project is not available, this dictionary will be empty.
+        /// </summary>
+        public IDictionary<Type, IDictionary<string, Tuple<object, object, object>>> Indexes { get; private set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
             Justification = "MessageCenter is IDisposable but cannot call Dispose yet as it lives past the end of this method call.")]

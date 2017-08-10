@@ -1,12 +1,5 @@
-﻿using Orleans.Runtime;
-using Orleans.Runtime.MembershipService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
-using System.Collections;
-using System.Linq.Expressions;
 using Orleans.Streams;
 
 namespace Orleans.Indexing
@@ -29,12 +22,7 @@ namespace Orleans.Indexing
         public override async Task<IOrleansQueryResult<TIGrain>> GetResults()
         {
             IndexInterface index = GetGrainFactory().GetIndex(_indexName, typeof(TIGrain));
-            //Type indexType = index.GetType();
-            //if(indexType.GetGenericTypeDefinition() == typeof(AHashIndexPartitionedPerSiloImpl<,>))
-            //{
-            //    indexType.GetMethod("SetGrainFactory").Invoke(index, new object[] { GetGrainFactory() });
-            //}
-
+            
             //the actual lookup for the query result to be streamed to the observer
             return (IOrleansQueryResult<TIGrain>) await index.Lookup(_param);
         }
@@ -42,12 +30,6 @@ namespace Orleans.Indexing
         public override async Task ObserveResults(IAsyncBatchObserver<TIGrain> observer)
         {
             IndexInterface index = GetGrainFactory().GetIndex(_indexName, typeof(TIGrain));
-            //Type indexType = index.GetType();
-            //if(indexType.GetGenericTypeDefinition() == typeof(AHashIndexPartitionedPerSiloImpl<,>))
-            //{
-            //    indexType.GetMethod("SetGrainFactory").Invoke(index, new object[] { GetGrainFactory() });
-            //}
-            //a stream is created for the query result
             IAsyncStream<TIGrain> resultStream = GetStreamProvider().GetStream<TIGrain>(Guid.NewGuid(), IndexUtils.GetIndexGrainID(typeof(TIGrain), _indexName));
 
             IOrleansQueryResultStream<TIGrain> result = new OrleansQueryResultStream<TIGrain>(resultStream);

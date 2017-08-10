@@ -1,5 +1,4 @@
-﻿using Orleans;
-using Orleans.Concurrency;
+﻿using Orleans.Concurrency;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,12 +23,12 @@ namespace Orleans.Indexing
         Task<object> ExtractIndexImage(IIndexUpdateGenerator iUpdateGen);
 
         /// <summary>
-        /// This method returns the list of active work-flow IDs for an I-Index
+        /// This method returns the list of active work-flow IDs for a Total Index
         /// </summary>
         Task<Immutable<HashSet<Guid>>> GetActiveWorkflowIdsList();
 
         /// <summary>
-        /// This method removes a work-flow ID from the list of active work-flow IDs for an I-Index
+        /// This method removes a work-flow ID from the list of active work-flow IDs for a Total Index
         /// </summary>
         Task RemoveFromActiveWorkflowIds(HashSet<Guid> removedWorkflowId);
     }

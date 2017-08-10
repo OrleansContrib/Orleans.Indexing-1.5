@@ -747,19 +747,6 @@ namespace Orleans.Runtime
         private void SetupStorageProvider(Type grainType, ActivationData data)
         {
             data.StorageProvider = SetupStorageProvider(grainType);
-
-            if (logger.IsVerbose2)
-            {
-                string grainTypeName = grainType.FullName;
-
-                var attrs = grainType.GetCustomAttributes(typeof(StorageProviderAttribute), true);
-                var attr = attrs.FirstOrDefault() as StorageProviderAttribute;
-                string storageProviderName = attr != null ? attr.ProviderName : Constants.DEFAULT_STORAGE_PROVIDER_NAME;
-
-                string msg = string.Format("Assigned storage provider with Name={0} to grain type {1}",
-                    storageProviderName, grainTypeName);
-                logger.Verbose2(ErrorCode.Provider_CatalogStorageProviderAllocated, msg);
-            }
         }
 
         internal IStorageProvider SetupStorageProvider(Type grainInstanceType)
@@ -795,6 +782,13 @@ namespace Orleans.Runtime
                     logger.Error(ErrorCode.Provider_CatalogNoStorageProvider_2, errMsg);
                     throw new BadProviderConfigException(errMsg);
                 }
+            }
+
+            if (logger.IsVerbose2)
+            {
+                string msg = string.Format("Assigned storage provider with Name={0} to grain type {1}",
+                    storageProviderName, grainTypeName);
+                logger.Verbose2(ErrorCode.Provider_CatalogStorageProviderAllocated, msg);
             }
             return provider;
         }

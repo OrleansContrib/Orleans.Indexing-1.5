@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Orleans.Runtime;
 using System.Linq.Expressions;
@@ -110,45 +108,23 @@ namespace Orleans.Indexing
         }
 
         /// <summary>
-        /// Creates an index grain, given its type and
-        /// the type of its IndexUpdateGenerator.
-        /// 
-        /// The created index grain is not registered and will not do anything 
-        /// unless it is registered by calling IndexFactory.RegisterIndex.
+        /// This is a helper method for creating an index on a field of an actor.
         /// </summary>
-        /// <typeparam name="IIdxType">the type of grain interface
-        /// of the index</typeparam>
-        /// <typeparam name="IndexUpdateGenType">the type of
-        /// IndexUpdateGenerator of the index</typeparam>
-        /// <param name="indexName">the name of the index, which
-        /// is the identifier of the index</param>
-        /// <returns>the created index grain</returns>
-        //internal static IIdxType CreateIndexGrain<IIdxType>(this IGrainFactory gf, string indexName) where IIdxType : IndexInterface
-        //{
-        //    Type idxType = typeof(IIdxType);
-        //    Type iIndexType = idxType.GetGenericType(typeof(IndexInterface<,>));
-        //    if (iIndexType != null)
-        //    {
-        //        Type[] indexTypeArgs = iIndexType.GetGenericArguments();
-        //        //Type keyType = indexTypeArgs[0];
-        //        Type grainType = indexTypeArgs[1];
-
-        //        IIdxType indexGrain = gf.GetGrain<IIdxType>(IndexUtils.GetIndexGrainID(grainType, indexName));
-        //        return indexGrain;
-        //    }
-        //    else
-        //    {
-        //        throw new NotSupportedException(string.Format("Adding an index that does not implement IndexInterface<K,V> is not supported yet. Your requested index ({0}) is invalid.", idxType.ToString()));
-        //    }
-        //}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="gf"></param>
-        /// <param name="idxType"></param>
-        /// <param name="indexName"></param>
-        /// <returns></returns>
+        /// <param name="gf">The current instance of IGrainFactory</param>
+        /// <param name="idxType">The type of index to be created</param>
+        /// <param name="indexName">The index name to be created</param>
+        /// <param name="isUniqueIndex">Determines whether this is a unique index that needs to be created</param>
+        /// <param name="isEager">Determines whether updates to this index should be applied eagerly or not</param>
+        /// <param name="maxEntriesPerBucket">Determines the maximum number of entries in
+        /// each bucket of a distributed index, if this index type is a distributed one.</param>
+        /// <param name="indexedProperty">the PropertyInfo object for the indexed field.
+        /// This object helps in creating a default instance of IndexUpdateGenerator.</param>
+        /// <returns>A triple that consists of:
+        /// 1) the index object (that implements IndexInterface
+        /// 2) the IndexMetaData object for this index, and
+        /// 3) the IndexUpdateGenerator instance for this index.
+        /// This triple is untyped, because IndexInterface, IndexMetaData
+        /// and IndexUpdateGenerator types are not visible in the core project.</returns>
         internal static Tuple<object, object, object> CreateIndex(this IGrainFactory gf, Type idxType, string indexName, bool isUniqueIndex, bool isEager, int maxEntriesPerBucket, PropertyInfo indexedProperty)
         {
             Type iIndexType = idxType.GetGenericType(typeof(IndexInterface<,>));
@@ -219,78 +195,5 @@ namespace Orleans.Indexing
                 ));
             }
         }
-
-        /// <summary>
-        /// Registers the given index with the given name
-        /// into the Orleans Indexing runtime.
-        /// </summary>
-        /// <typeparam name="IIdxType">the type of the index to
-        /// be registered</typeparam>
-        /// <param name="indexName">the name of the index, which
-        /// is the identifier of the index</param>
-        /// <param name="index">the index grain to be registered</param>
-        /// <returns>whether the registration of the index was
-        /// successful or not.</returns>
-        //public static async Task<bool> RegisterIndex<IIdxType, IndexUpdateGenType>(this IGrainFactory gf, string indexName, IIdxType index) where IIdxType : IndexInterface where IndexUpdateGenType : IIndexUpdateGenerator, new()
-        //{
-        //    Type idxType = index.GetType();
-        //    Type iIndexType = idxType.GetGenericType(typeof(IndexInterface<,>));
-        //    if (iIndexType != null)
-        //    {
-        //        Type[] indexTypeArgs = iIndexType.GetGenericArguments();
-        //        //Type keyType = indexTypeArgs[0];
-        //        Type iGrainType = indexTypeArgs[1];
-
-        //        //string indexName = await index.GetIndexName();
-        //        bool isRegistered = await IndexRegistry.RegisterIndex(iGrainType, indexName, index, new IndexMetaData(typeof(IIdxType), typeof(IndexUpdateGenType)));
-        //        if (isRegistered)
-        //        {
-        //            Type indexBuilderType = typeof(IIndexBuilder<>).MakeGenericType(new Type[] { iGrainType });
-        //            IIndexBuilder indexBuilder = gf.GetGrain<IIndexBuilder<IIndexableGrain>>(IndexUtils.GetIndexGrainID(iGrainType, indexName), indexBuilderType);
-        //            var _ = indexBuilder.BuildIndex(indexName, index, new IndexUpdateGenType()); //builds the index on its own without coming back here
-        //        }
-        //        return isRegistered;
-        //    }
-        //    else
-        //    {
-        //        throw new NotSupportedException(string.Format("Registering indexes that do not implement IndexInterface<K,V> is not supported yet. Your requested index ({0}) is invalid.", idxType.ToString()));
-        //    }
-        //}
-
-        /// <summary>
-        /// A call to CreateIndexGrain followed by a call to RegisterIndex.
-        /// </summary>
-        /// <typeparam name="IIdxType">the type of the index to
-        /// be registered</typeparam>
-        /// <typeparam name="IndexUpdateGenType">the type of
-        /// IndexUpdateGenerator of the index</typeparam>
-        /// <param name="indexName">the name of the index, which
-        /// is the identifier of the index</param>
-        /// <returns>whether the creation and registration of the
-        /// index was successful or not.</returns>
-        //public static Task<bool> CreateAndRegisterIndex<IIdxType, IndexUpdateGenType>(this IGrainFactory gf, string indexName) where IIdxType : IndexInterface where IndexUpdateGenType : IIndexUpdateGenerator, new()
-        //{
-        //    IIdxType index = CreateIndexGrain<IIdxType>(gf, indexName);
-        //    return RegisterIndex<IIdxType, IndexUpdateGenType>(gf, indexName, index);
-        //}
-
-        /// <summary>
-        /// Drops all the indexes defined for a given grain interface.
-        /// </summary>
-        /// <typeparam name="IGrainType">the given grain interface</typeparam>
-        //public static async Task DropAllIndexes<IGrainType>(this IGrainFactory gf) where IGrainType : IIndexableGrain
-        //{
-        //    await IndexRegistry.DropAllIndexes<IGrainType>();
-        //}
-
-        /// <summary>
-        /// Drops an index defined for a given grain interface provided its name.
-        /// </summary>
-        /// <typeparam name="IGrainType">the given grain interface</typeparam>
-        /// <param name="indexName">the name of the index</param>
-        //public static async Task DropIndex<IGrainType>(this IGrainFactory gf, string indexName) where IGrainType : IIndexableGrain
-        //{
-        //    await IndexRegistry.DropIndex<IGrainType>(indexName);
-        //}
     }
 }

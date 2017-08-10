@@ -35,14 +35,6 @@ namespace Orleans.Providers.Azure
         AzureBlobProvider_ClearingData              = AzureBlobProviderBase + 15,
         AzureBlobProvider_Cleared                   = AzureBlobProviderBase + 16,
 
-        DocumentDBProviderBase                 = ProvidersBase + 500,
-        DocumentDBProvider_InitProvider        = DocumentDBProviderBase + 1,
-        DocumentDBProvider_ReadError           = DocumentDBProviderBase + 2,
-        DocumentDBProvider_WriteError          = DocumentDBProviderBase + 3,
-        DocumentDBProvider_WriteEtagError      = DocumentDBProviderBase + 4,
-        DocumentDBProvider_DeleteError         = DocumentDBProviderBase + 5,
-        DocumentDBProvider_TypeNotFound        = DocumentDBProviderBase + 6,
-
 
 
     }

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Orleans.CodeGeneration;
 using Orleans.Runtime;
 using Orleans.Concurrency;
 
@@ -17,9 +14,9 @@ namespace Orleans.Indexing
         /// </summary>
         public static Task<bool> ApplyIndexUpdateBatch(this IndexInterface index, Immutable<IDictionary<IIndexableGrain, IList<IMemberUpdate>>> iUpdates, bool isUniqueIndex, IndexMetaData idxMetaData, SiloAddress siloAddress = null)
         {
-            if (index is AHashIndexPartitionedPerSilo)
+            if (index is ActiveHashIndexPartitionedPerSilo)
             {
-                AHashIndexPartitionedPerSiloBucket bucketInCurrentSilo = InsideRuntimeClient.Current.InternalGrainFactory.GetSystemTarget<AHashIndexPartitionedPerSiloBucket>(
+                ActiveHashIndexPartitionedPerSiloBucket bucketInCurrentSilo = InsideRuntimeClient.Current.InternalGrainFactory.GetSystemTarget<ActiveHashIndexPartitionedPerSiloBucket>(
                     GetAHashIndexPartitionedPerSiloGrainID(IndexUtils.GetIndexNameFromIndexGrain((IAddressable)index), index.GetType().GetGenericArguments()[1]),
                     siloAddress
                 );
@@ -34,9 +31,9 @@ namespace Orleans.Indexing
         /// </summary>
         internal static Task<bool> ApplyIndexUpdate(this IndexInterface index, IIndexableGrain updatedGrain, Immutable<IMemberUpdate> update, bool isUniqueIndex, IndexMetaData idxMetaData, SiloAddress siloAddress = null)
         {
-            if (index is AHashIndexPartitionedPerSilo)
+            if (index is ActiveHashIndexPartitionedPerSilo)
             {
-                AHashIndexPartitionedPerSiloBucket bucketInCurrentSilo = InsideRuntimeClient.Current.InternalGrainFactory.GetSystemTarget<AHashIndexPartitionedPerSiloBucket>(
+                ActiveHashIndexPartitionedPerSiloBucket bucketInCurrentSilo = InsideRuntimeClient.Current.InternalGrainFactory.GetSystemTarget<ActiveHashIndexPartitionedPerSiloBucket>(
                     GetAHashIndexPartitionedPerSiloGrainID(IndexUtils.GetIndexNameFromIndexGrain((IAddressable )index), index.GetType().GetGenericArguments()[1]),
                     siloAddress
                 );

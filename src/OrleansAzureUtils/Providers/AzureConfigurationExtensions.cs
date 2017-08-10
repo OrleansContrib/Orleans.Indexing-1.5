@@ -5,7 +5,6 @@ using Orleans.Providers.Streams.Common;
 using Orleans.Serialization;
 using Orleans.Storage;
 using Orleans.Streams;
-using Orleans.StorageProvider.DocumentDB;
 
 namespace Orleans.Runtime.Configuration
 {
@@ -84,37 +83,6 @@ namespace Orleans.Runtime.Configuration
             };
 
             config.Globals.RegisterStorageProvider<AzureBlobStorage>(providerName, properties);
-        }
-
-        /// <summary>
-        /// Adds a storage provider of type <see cref="DocumentDBStorageProvider"/>.
-        /// </summary>
-        /// <param name="config">The cluster configuration object to add provider to.</param>
-        /// <param name="providerName">The provider name.</param>
-        /// <param name="url">The DocumentDB connection url.</param>
-        /// <param name="key">The key for using the DocumentDB.</param>
-        /// <param name="database">The database in DocumentDB that we'll use for this connection.</param>
-        public static void AddDocumentDBStorageProvider(
-            this ClusterConfiguration config,
-            string providerName = "DocumentDBStore",
-            string url = null,
-            string key = null,
-            string database = null,
-            //string offerTypeVersion = null,
-            string offerType = null,
-            string indexingMode = null)
-        {
-            var properties = new Dictionary<string, string>
-            {
-                { DocumentDBStorageProvider.URL, url },
-                { DocumentDBStorageProvider.KEY, key },
-                { DocumentDBStorageProvider.DATABASE, database },
-                //{ DocumentDBStorageProvider.OFFER_TYPE_VERSION, offerTypeVersion },
-                { DocumentDBStorageProvider.OFFER_TYPE, offerType },
-                { DocumentDBStorageProvider.INDEXING_MODE, indexingMode }
-            };
-
-            config.Globals.RegisterStorageProvider<DocumentDBStorageProvider>(providerName, properties);
         }
 
         /// <summary>

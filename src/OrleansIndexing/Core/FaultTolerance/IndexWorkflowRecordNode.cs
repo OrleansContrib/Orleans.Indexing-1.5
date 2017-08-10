@@ -1,15 +1,6 @@
-﻿using Orleans.Concurrency;
-using Orleans.Core;
-using Orleans.Providers;
-using Orleans.Runtime;
-using Orleans.Storage;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Orleans.Indexing
 {
@@ -76,27 +67,6 @@ namespace Orleans.Indexing
 
             Clean();
         }
-
-        /// <summary>
-        /// This method gathers all the IndexWorkflowRecords that belong to the
-        /// same grain and are continuously one after the other
-        /// </summary>
-        /// <returns>the continuous list of IndexWorkflowRecords for the same grain</returns>
-        //public IList<IndexWorkflowRecord> GetContinousListForTheSameGrain()
-        //{
-        //    IList<IndexWorkflowRecord> res = new List<IndexWorkflowRecord>();
-        //    res.Add(WorkflowRecord);
-
-        //    IIndexableGrain thisGrain = WorkflowRecord.Grain;
-        //    IndexWorkflowRecordNode tmp = Next;
-        //    while (tmp != null && tmp.WorkflowRecord.Grain == thisGrain)
-        //    {
-        //        res.Add(tmp.WorkflowRecord);
-        //        tmp = tmp.Next;
-        //    }
-
-        //    return res;
-        //}
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Clean()
