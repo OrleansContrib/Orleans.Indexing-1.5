@@ -1,124 +1,102 @@
-<p align="center">
-  <img src="https://github.com/dotnet/orleans/blob/gh-pages/assets/logo_full.png" alt="Orleans logo" width="600px"> 
-</p>
-=======
+# Orleans Indexing
 
+> THIS PROJECT IS NOT READY FOR PRODUCTION USE. It has undergone a modest amount of testing and code review. It is published to collect community feedback and attract others to make it production-ready. 
 
+Enables grains to be indexed and queried by scalar properties. A research paper describing the interface and implementation can be found [here](http://cidrdb.org/cidr2017/papers/p29-bernstein-cidr17.pdf).
 
+## Features
 
-[![Build status](http://ci.dot.net/job/dotnet_orleans/job/master/job/netfx/badge/icon)](http://ci.dot.net/job/dotnet_orleans/job/master/)
-[![NuGet](https://img.shields.io/nuget/v/Microsoft.Orleans.Core.svg?style=flat)](http://www.nuget.org/profiles/Orleans)
+- Index all grains of a class 
+- Fault-tolerant multi-step workflow for index update
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dotnet/orleans?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+###Configuration Options
+- Store an index as a single grain
+- Partition an index with a bucket for each key value
+- Index only the activated grains of a class
+- Physically parititon an index over activated grains, so grains and their index are on the same silo
+- Allow index to have very large buckets, to handle highly-skewed distribution of values
 
-[![Help Wanted Issues](https://badge.waffle.io/dotnet/orleans.svg?label=up-for-grabs&title=Help Wanted Issues)](http://waffle.io/dotnet/orleans)
+## Source Code
 
-Orleans is a framework that provides a straight-forward approach to building distributed high-scale computing applications, without the need to learn and apply complex concurrency or other scaling patterns. 
+See [src/OrleansIndexing](src/OrleansIndexing) and [test/Tester/IndexingTests](test/Tester/IndexingTests)
 
-It was created by [Microsoft Research](http://research.microsoft.com/projects/orleans/) 
-implementing the [Virtual Actor Model](http://research.microsoft.com/apps/pubs/default.aspx?id=210931) 
-and designed for use in the cloud. 
+## Example Usage
 
-Orleans has been used extensively running in Microsoft Azure by several Microsoft product groups, most notably by [343 Industries](https://www.halowaypoint.com/) as a platform for all of Halo 4 and Halo 5 cloud services, as well as by [a number of other projects and companies](http://dotnet.github.io/orleans/Community/Who-Is-Using-Orleans.html).
+In this example usage, we assume that we are indexing the location of players in a game and we want to query the players based on their location. First, we describe the steps for defining an index on a grain. Then, we explain the steps for using an index in the queries.
 
-Installation
-============
+### Defining an index
 
-Installation is performed via [NuGet](https://www.nuget.org/packages?q=orleans). 
-There are several packages, one for each different project type (interfaces, grains, silo, and client).
+All the indexable properties of a grain should be defined in a properties class. The type of index is declared by adding annotations on the indexed property. Currently, three index annotations are available: [ActiveIndex](src/OrleansIndexing/Core/Annotations/ActiveIndexAttribute.cs), [TotalIndex](src/OrleansIndexing/Core/Annotations/TotalIndexAttribute.cs), and [StorageManagedIndex](src/OrleansIndexing/Core/Annotations/StorageManagedIndexAttribute.cs). In this example, PlayerProperties contains the only indexed property of a player, which is its location. We want to index the location of all the players that are currently active.
 
-In the grain interfaces project:
-```
-PM> Install-Package Microsoft.Orleans.OrleansCodeGenerator.Build
-```
-In the grain implementations project:
-```
-PM> Install-Package Microsoft.Orleans.OrleansCodeGenerator.Build
-```
-In the server (silo) project:
-```
-PM> Install-Package Microsoft.Orleans.Server
-```
-In the client project:
-```
-PM> Install-Package Microsoft.Orleans.Client
-```
-
-### Official Builds
-
-The stable production-quality release is located [here](https://github.com/dotnet/orleans/releases/latest).
-
-The latest clean development branch build from CI is located: [here](https://ci.dot.net/job/dotnet_orleans/job/master/job/netfx/lastStableBuild/artifact/)
-
-### Building From Source
-
-Clone the sources from the GitHub [repo](https://github.com/dotnet/orleans) 
-
-Run run the `Build.cmd` script to build the binaries locally,
-then reference the required NuGet packages from `Binaries\NuGet.Packages\*`.
-
-Documentation
-=============
-
-Documentation is located [here](http://dotnet.github.io/orleans/)
-
-Code Examples
-=============
-
-Create an interface for your grain:
 ```c#
-public interface IHello : Orleans.IGrainWithIntegerKey
+    [Serializable]
+    public class PlayerProperties
+    {
+        [ActiveIndex]
+        string Location { get; set; }
+    }
+```
+
+The grain interface for the player should implement the `IIndexableGrain<PlayerProperties>` interface. This is a marker interface that declares the IPlayerGrain as an indexed grain interface where its indexed properties are defined in the PlayerProperties class.
+
+```c#
+    public interface IPlayerGrain : IGrainWithIntegerKey, IIndexableGrain<PlayerProperties>
+    {
+        Task<string> GetLocation();
+        Task SetLocation(string location);
+    }
+```
+
+The grain implementation for the player should extend the IndexableGrain<PlayerProperties> class.
+
+```c#
+    public class PlayerGrain : IndexableGrain<PlayerProperties>, IPlayerGrain
+    {
+        public string Location { get { return State.Location; } }
+
+        public Task<string> GetLocation()
+        {
+            return Task.FromResult(Location);
+        }
+
+        public async Task SetLocation(string location)
+        {
+            State.Location = location;
+            // the call to base.WriteStateAsync() determines
+            // when the changes to the grain are applied to its
+            // corresponding indexes.
+            await base.WriteStateAsync();
+        }
+    }
+```
+
+### Using an index to query the grains
+
+The code below queries all the players based on their locations and prints the information related to all the player grains that are located in Zurich.
+
+```c#
+var q = from player in GrainClient.GrainFactory.GetActiveGrains<IPlayerGrain, PlayerProperties>()
+        where player.Location == "Zurich"
+        select player;
+        
+q.ObserveResults(new QueryResultStreamObserver<IPlayerGrain>(async entry =>
 {
-  Task<string> SayHello(string greeting);
-}
+    output.WriteLine("primary key = {0}, location = {1}", entry.GetPrimaryKeyLong(), await entry.GetLocation());
+}));
 ```
 
-Provide an implementation of that interface:
-```c#
-public class HelloGrain : Orleans.Grain, IHello
-{
-  Task<string> SayHello(string greeting)
-  {
-    return Task.FromResult($"You said: '{greeting}', I say: Hello!");
-  }
-}
-```
+For more examples, please have a look at [test/Tester/IndexingTests](test/Tester/IndexingTests).
 
-Call the grain from your Web service (or anywhere else):
-```c#
-// Get a reference to the IHello grain with id '0'.
-var friend = GrainClient.GrainFactory.GetGrain<IHello>(0);
+## To Do
 
-// Send a greeting to the grain and await the response.
-Console.WriteLine(await friend.SayHello("Good morning, my friend!"));
-```
+- Range indexes
+- Replace workflows by transactions
+- Replace inheritance by dependency injection (like for transactions)
 
-Community
-=========
+## License
 
-* Ask questions by [opening an issue on GitHub](https://github.com/dotnet/orleans/issues) or on [Stack Overflow](https://stackoverflow.com/questions/ask?tags=orleans)
+- This project is licensed under the [MIT license](https://github.com/dotnet/orleans/blob/master/LICENSE).
 
-* [Chat on Gitter](https://gitter.im/dotnet/orleans)
 
-* Follow the [@MSFTOrleans](https://twitter.com/MSFTOrleans) Twitter account for Orleans announcements.
 
-* [OrleansContrib - Repository of community add-ons to Orleans](https://github.com/OrleansContrib/) Various community projects, including Orleans Monitoring, Design Patterns, Storage Provider, etc.
 
-* Guidelines for developers wanting to [contribute code changes to Orleans](http://dotnet.github.io/orleans/Community/Contributing.html).
-
-* You are also encouraged to report bugs or start a technical discussion by starting a new [thread](https://github.com/dotnet/orleans/issues) on GitHub.
-
-License
-=======
-This project is licensed under the [MIT license](https://github.com/dotnet/orleans/blob/master/LICENSE).
-
-Quick Links
-===========
-
-* [MSR-ProjectOrleans](http://research.microsoft.com/projects/orleans/)
-* Orleans Tech Report - [Distributed Virtual Actors for Programmability and Scalability](http://research.microsoft.com/apps/pubs/default.aspx?id=210931)
-* [Orleans-GitHub](https://github.com/dotnet/orleans)
-* [Orleans Documentation](http://dotnet.github.io/orleans/)
-* [Contributing](http://dotnet.github.io/orleans/Community/Contributing.html)
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
