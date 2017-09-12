@@ -9,7 +9,7 @@ Enables grains to be indexed and queried by scalar properties. A research paper 
 - Index all grains of a class 
 - Fault-tolerant multi-step workflow for index update
 
-###Configuration Options
+### Configuration Options
 - Store an index as a single grain
 - Partition an index with a bucket for each key value
 - Index only the activated grains of a class
