@@ -20,6 +20,8 @@ Enables grains to be indexed and queried by scalar properties. A research paper 
 
 See [src/OrleansIndexing](src/OrleansIndexing) and [test/Tester/IndexingTests](test/Tester/IndexingTests)
 
+To build, run the `Build.cmd` or open `src\Orleans.sln`
+
 ## Example Usage
 
 In this example usage, we assume that we are indexing the location of players in a game and we want to query the players based on their location. First, we describe the steps for defining an index on a grain. Then, we explain the steps for using an index in the queries.
